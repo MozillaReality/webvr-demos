@@ -1,0 +1,104 @@
+<html>
+
+  <head>
+    <style>
+      body{ margin: 0px; }
+    </style>
+  </head>
+
+  <body>
+
+    <script src="lib/three.min.js"></script>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/TrackballControls.js"></script>
+    
+    <script src="../ShaderLoader.js"></script>
+
+    <script>
+
+
+      var uniforms = {
+
+        ambientLightColor:{ type:"c" , value:new THREE.Color( 0xffffff) },
+        diffuseLightColor:{ type:"c" , value:new THREE.Color( 0xffffff ) },
+        specularLightColor:{ type:"c" , value:new THREE.Color( 0xffffff ) },
+        
+        ambientMaterialColor:{ type:"c" , value:new THREE.Color( 0x000fee ) },
+        diffuseMaterialColor:{ type:"c" , value:new THREE.Color( 0xc0aa99 ) },
+        specularMaterialColor:{ type:"c" , value:new THREE.Color( 0xff0000 ) },
+
+        shininess:{ type:"f" , value:80 },
+        lightPosition:{ type:"v3" , value: new THREE.Vector3( 300 , 300 , 300 ) }
+
+      }
+
+      var camera, renderer, scene , controls;
+      
+      var vs, fs;
+
+      var geometry, material , light;
+
+
+      var shaders = new ShaderLoader( '../shaders' ,  '../shaderChunks' );
+
+      shaders.shaderSetLoaded = function(){
+        init();
+        animate();
+      }
+
+      shaders.load( 'vs-ads' , 'ads' , 'vertex' );
+      shaders.load( 'fs-ads' , 'ads' , 'fragment' );
+
+      function init(){
+
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+
+        camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 2000 );
+        camera.position.z = 1000;
+
+        controls = new THREE.TrackballControls( camera );
+        scene = new THREE.Scene();
+
+        light = new THREE.PointLight( 0xff00ff , 3 , 1000 );
+        light.position.set( 300 , 300 ,300 );
+        scene.add( light );
+
+        lightMarker = new THREE.Mesh( 
+          new THREE.IcosahedronGeometry( 10 , 1 ),
+          new THREE.MeshBasicMaterial({ color: light.color })
+        );
+        light.add( lightMarker );
+
+        geometry = new THREE.SphereGeometry( 200, 20, 20 );
+        geometry.computeVertexNormals();
+        
+        material = new THREE.ShaderMaterial({
+
+          uniforms:uniforms,
+          vertexShader:   shaders.vertexShaders.ads,
+          fragmentShader: shaders.fragmentShaders.ads,
+
+        });
+       
+        mesh = new THREE.Mesh( geometry, material );
+        scene.add( mesh );
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        document.body.appendChild( renderer.domElement );
+
+      }
+
+      function animate(){
+
+        requestAnimationFrame( animate );
+        controls.update();
+        renderer.render( scene , camera );
+      }
+
+    </script>
+
+  </body>
+</html>

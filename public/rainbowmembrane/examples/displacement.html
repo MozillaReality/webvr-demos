@@ -1,0 +1,88 @@
+<html>
+
+  <head>
+    <style>
+      body{ margin: 0px; }
+    </style>
+  </head>
+
+  <body>
+
+    <script src="lib/three.min.js"></script>
+    <script src="lib/jquery.min.js"></script>
+    <script src="lib/TrackballControls.js"></script>
+    
+    <script src="../ShaderLoader.js"></script>
+
+    <script>
+
+
+      var uniforms = {
+        time:{type:"f",value:0}
+      }
+
+      var camera, renderer, scene , controls, clock;;
+      
+      var vs, fs;
+
+      var geometry, material , light;
+
+
+      var shaders = new ShaderLoader( '../shaders' , '../shaderChunks' );
+
+      shaders.shaderSetLoaded = function(){
+        init();
+        animate();
+      }
+
+      shaders.load( 'vs-displacement' , 'displacement' , 'vertex' );
+      shaders.load( 'fs-displacement' , 'displacement' , 'fragment' );
+
+      function init(){
+
+        var w = window.innerWidth;
+        var h = window.innerHeight;
+
+        clock = new THREE.Clock();
+
+        camera = new THREE.PerspectiveCamera( 65 , w/h , 1 , 2000 );
+        camera.position.z = 1000;
+
+        controls = new THREE.TrackballControls( camera );
+        scene = new THREE.Scene();
+
+      
+        geometry = new THREE.IcosahedronGeometry( 200, 6 );
+        geometry.computeVertexNormals();
+        
+        material = new THREE.ShaderMaterial({
+
+          uniforms:uniforms,
+          vertexShader:   shaders.vertexShaders.displacement,
+          fragmentShader: shaders.fragmentShaders.displacement,
+
+        });
+       
+        mesh = new THREE.Mesh( geometry, material );
+        scene.add( mesh );
+
+        renderer = new THREE.WebGLRenderer();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+
+        document.body.appendChild( renderer.domElement );
+
+      }
+
+      function animate(){
+
+        requestAnimationFrame( animate );
+        
+        uniforms.time.value += clock.getDelta();
+        controls.update();
+        renderer.render( scene , camera );
+      }
+
+    </script>
+
+  </body>
+</html>
