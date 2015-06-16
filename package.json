@@ -18,10 +18,10 @@
   ],
   "devDependencies": {
     "http-server": "^0.8.0",
-    "mozvr-site": "cvan/mozvr-site#use-locals-url"
+    "mozvr-site": "cvan/mozvr-site#offline"
   },
   "scripts": {
     "start": "pushd public && http-server -p $PORT -i=false -c -1 --cors && popd",
-    "postinstall": "mkdir -p public/polarsea/videos/ && curl -o public/polarsea/videos/PolarSeaTrailer-3.webm 'http://mozvr.com/projects/polarsea/content/videos/PolarSeaTrailer-3.webm' -o public/polarsea/videos/PolarSeaTrailer-3.mp4 'http://mozvr.com/projects/polarsea/content/videos/PolarSeaTrailer-3.mp4' && mkdir -p public/mozvr-site/ && pushd node_modules/mozvr-site/ && wintersmith build -o ../../public/mozvr-site/ && popd"
+    "postinstall": "mkdir -p public/polarsea/videos/ && curl -o public/polarsea/videos/PolarSeaTrailer-3.webm 'http://mozvr.com/projects/polarsea/content/videos/PolarSeaTrailer-3.webm' -o public/polarsea/videos/PolarSeaTrailer-3.mp4 'http://mozvr.com/projects/polarsea/content/videos/PolarSeaTrailer-3.mp4' && mkdir -p public/mozvr-site/ && pushd node_modules/mozvr-site/ && sed -e 's/\"url\":.*$/\"url\": \"\\/mozvr-site\\/\",/g' config.json > config_local.json wintersmith build -o ../../public/mozvr-site/ --config config_local.json && rm -f config_local.json && popd && mkdir -p public/mozvr-site/ && pushd node_modules/mozvr-site/ && sed -e 's/\"url\":.*$/\"url\": \"\\/mozvr-site\\/\",/g' config.json > config_local.json && wintersmith build -o ../../public/mozvr-site/ --config config_local.json && rm -f config_local.json && popd"
   }
 }
