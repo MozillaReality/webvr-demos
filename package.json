@@ -17,7 +17,9 @@
     "js"
   ],
   "devDependencies": {
-    "http-server": "^0.8.0",
+    "http-server": "^0.8.0"
+  },
+  "dependencies": {
     "mozvr-site": "cvan/mozvr-site#offline"
   },
   "scripts": {
