@@ -23,8 +23,8 @@
     "mozvr-site": "cvan/mozvr-site#offline"
   },
   "scripts": {
-    "start": "pushd public && http-server -p $PORT -i=false -c -1 --cors && popd",
+    "start": "cd public && http-server -p $PORT -i=false -c -1 --cors && cd -",
     "postinstall": "POLAR_SEA_VIDEOS_URL='http://mozvr.com/projects/polarsea/content/videos/' npm run syncmedia",
-    "syncmedia": "mkdir -p public/demos/polarsea/videos/ && curl -o public/demos/polarsea/videos/PolarSeaTrailer-3.webm $POLAR_SEA_VIDEOS_URL'PolarSeaTrailer-3.webm' -o public/demos/polarsea/videos/PolarSeaTrailer-3.mp4 $POLAR_SEA_VIDEOS_URL'PolarSeaTrailer-3.mp4' && mkdir -p public/demos/mozvr-site/ && pushd node_modules/mozvr-site/ && sed -e 's/\"url\":.*$/\"url\": \"\\/demos\\/mozvr-site\",/g' config.json > config_local.json && wintersmith build -o ../../public/demos/mozvr-site/ --config config_local.json && rm -f config_local.json && popd"
+    "syncmedia": "mkdir -p public/demos/polarsea/videos/ && curl -o public/demos/polarsea/videos/PolarSeaTrailer-3.webm $POLAR_SEA_VIDEOS_URL'PolarSeaTrailer-3.webm' -o public/demos/polarsea/videos/PolarSeaTrailer-3.mp4 $POLAR_SEA_VIDEOS_URL'PolarSeaTrailer-3.mp4' && mkdir -p public/demos/mozvr-site/ && cd node_modules/mozvr-site/ && sed -e 's/\"url\":.*$/\"url\": \"\\/demos\\/mozvr-site\",/g' config.json > config_local.json && wintersmith build -o ../../public/demos/mozvr-site/ --config config_local.json && rm -f config_local.json && cd -"
   }
 }
