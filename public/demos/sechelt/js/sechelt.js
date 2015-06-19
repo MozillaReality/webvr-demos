@@ -1,3 +1,4 @@
+// url parameters
 var parameters = (function() {
 	var parameters = {};
 	var parts = window.location.search.substr(1).split('&');
@@ -8,6 +9,7 @@ var parameters = (function() {
 	return parameters;
 })();
 
+// setup scene objects
 var camera, scene, renderer;
 var controls, effect;
 var orbitControls;
@@ -15,6 +17,7 @@ var controls2, clock = new THREE.Clock();
 var sky, water;
 var cameraPath;
 var dolly;
+
 var manager;
 
 function init() {
@@ -23,7 +26,6 @@ function init() {
 	});
 	renderer.autoClear = false;
 	renderer.setClearColor(0x404040);
-
 	document.body.appendChild(renderer.domElement);
 
 	scene = new THREE.Scene();
@@ -31,7 +33,6 @@ function init() {
 
 	dolly = new THREE.Group();
 	dolly.position.set(10000, 10000, 10000);
-
 	scene.add(dolly);
 
 	camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 20000);
@@ -41,13 +42,15 @@ function init() {
 	// Effect and Controls for VR
 	effect = new THREE.VREffect(renderer);
 	controls = new THREE.VRControls(camera);
-
 	orbitControls = new THREE.OrbitControls(camera);
+	orbitControls.noZoom = true;
 
 	onWindowResize();
 
 	// Initialize the WebVR manager.
-	manager = new WebVRManager(renderer, effect);
+	manager = new WebVRManager(renderer, effect, {
+		hideButton: true
+	});
 
 	// skybox
 	var geometry = new THREE.SphereGeometry(10000, 64, 32);
@@ -76,11 +79,9 @@ function init() {
 		color3.lerp(vertex3.y > 0 ? colorTop : colorBottom, Math.abs(vertex3.y) / 6000);
 
 		face.vertexColors.push(color1, color2, color3);
-
 	}
 
 	var material = new THREE.MeshBasicMaterial({
-		//vertexColors: THREE.VertexColors,
 		side: THREE.BackSide,
 		depthWrite: false,
 		depthTest: false,
@@ -101,7 +102,6 @@ function init() {
 	var vector = new THREE.Vector3();
 
 	for (var i = 0; i < 10000; i++) {
-
 		vector.x = Math.random() * 40000 - 20000;
 		vector.z = Math.random() * 40000 - 20000;
 
@@ -129,7 +129,6 @@ function init() {
 		var c = vertices.push(vertex3) - 1;
 
 		faces.push(new THREE.Face3(a, b, c));
-
 	}
 
 	var material = new THREE.MeshBasicMaterial({
@@ -143,27 +142,7 @@ function init() {
 	scene.add(mesh);
 
 
-	// water texture
-	// Causes massive jank and out-of-memory errors, so I abandoned this approach for time being...
-	/*
-	var texture = THREE.ImageUtils.loadTexture( 'images/waves-2.png' );
-	texture.wrapS = THREE.RepeatWrapping;
-	texture.wrapT = THREE.RepeatWrapping;
-	texture.repeat.set( 40, 40 );
-	var geometry = new THREE.PlaneGeometry( 10000, 10000, 1000, 1000 );
-	var material = new THREE.MeshBasicMaterial( {
-		//color: 0xffffff,
-		map: texture
-	} );
-	water2 = new THREE.Mesh( geometry, material );
-	water2.position.y = 3;
-	water2.rotation.x = - Math.PI / 2;
-	scene.add( water2 );
-	*/
-
-
 	// water
-
 	var geometry = new THREE.PlaneBufferGeometry(100000, 100000);
 	var material = new THREE.MeshBasicMaterial({
 		color: colorMiddle,
@@ -178,7 +157,6 @@ function init() {
 
 
 	// lights
-
 	var directionalLight = new THREE.DirectionalLight(0xffffff, 0.15);
 	directionalLight.position.set(-1, 1, -1);
 	scene.add(directionalLight);
@@ -189,7 +167,6 @@ function init() {
 
 
 	// load scene
-
 	var loader = new THREE.ObjectLoader();
 	loader.load('models/scene-nov4.json', function(object) {
 
@@ -224,11 +201,10 @@ function init() {
 		scene.add(object);
 
 		// sounds
-
-		//var listener = new THREE.AudioListener();
-		//camera.add( listener );
-
 		/*
+		var listener = new THREE.AudioListener();
+		camera.add( listener );
+
 		var sound = new THREE.Audio( listener );
 		sound.load( 'sounds/78389__inchadney__seagulls.ogg' );
 		sound.position.set( 475, 50, 850 );
@@ -252,15 +228,12 @@ function init() {
 		*/
 
 		// camera path
-
 		var loader = new THREE.C4DCurveLoader();
 		loader.load('models/flightpath-nov4-bezier.txt', function(curve) {
-
 			cameraPath = curve.toLinearCurve(1); // 1 = distance between points
 
 			/*
 			// debug points
-
 			var geometry = new THREE.Geometry();
 			geometry.vertices = cameraPath.getPoints();
 			var material = new THREE.PointCloudMaterial( { size: 0.1 } );
@@ -271,7 +244,6 @@ function init() {
 			scene.add( points );
 
 			// debug line
-
 			var geometry = new THREE.Geometry();
 			geometry.vertices = cameraPath.getPoints();
 			var material = new THREE.LineBasicMaterial();
@@ -282,19 +254,31 @@ function init() {
 			scene.add( line );
 			*/
 
+			// check url parameter to see if we should load vr.
+			if (parameters.mode == 'vr') {
+		  	manager.enterVR();
+		  };
 
-
+			// kick off animation loop
 			requestAnimationFrame(animate);
-
-
-
 		});
 
 	});
 
 
 	window.addEventListener('resize', onWindowResize, false);
-	//document.body.addEventListener('click', togglePlay);
+	
+	function handlePostmessage(e) {
+    if (e.data.mode == 'vr') {
+      manager.enterVR();
+    }
+
+    if (e.data.mode == 'mono') {
+    	manager.exitVR();
+    }
+  }
+
+  window.addEventListener('message', handlePostmessage);
 }
 
 var playing = true;
@@ -319,40 +303,30 @@ function onWindowResize() {
 };
 
 
-
 var currentTime = null,
 	startTime = null;
-gotime = null;
+	gotime = null;
 
 var speed = 20;
 
-
 function animate(time) {
-
 	requestAnimationFrame(animate);
 
 	if (cameraPath !== undefined) {
 		if (!startTime) startTime = time;
 		if (!currentTime) currentTime = time;
-
 		if (playing) currentTime += speed;
 
 		gotime = TWEEN.Easing.Sinusoidal.InOut(Math.min(currentTime / 70000, 1)) * 0.9999;
 
 		var pointA = cameraPath.getPointAt(gotime);
 		var pointB = cameraPath.getPointAt(Math.min(gotime + 0.0001, 1));
-
 		pointA.z = -pointA.z;
 		pointB.z = -pointB.z;
 
 		dolly.position.copy(pointA);
 		dolly.lookAt(pointB);
 		dolly.rotateY(Math.PI); // look forward
-
-	}
-
-	if (controls) {
-		controls.update();
 	}
 
 	sky.position.copy(dolly.position);
@@ -360,14 +334,14 @@ function animate(time) {
 	water.position.x = dolly.position.x;
 	water.position.z = dolly.position.z;
 
+	if (controls) controls.update();
+	
 	if (manager.isVRMode()) {
 		effect.render(scene, camera);
-		controls.update();
 	} else {
 		renderer.render(scene, camera);
 		orbitControls.update();
 	}
-
 }
 
 init();
