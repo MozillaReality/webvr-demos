@@ -14,7 +14,9 @@ camera.position.y = 75;
 var controls = new THREE.VRControls(camera);
 var effect = new THREE.VREffect(renderer);
 effect.setSize(window.innerWidth, window.innerHeight);
-var vrmgr = new WebVRManager(renderer, effect);
+// var vrmgr = new WebVRManager(renderer, effect, {
+// 	hideButton: true
+// });
 
 //////////////////////////////////////////////////////
 // CONVERT TO 2.5D SCENE
@@ -161,7 +163,6 @@ function playSound(){}
 
 // Request animation frame loop function
 function animate() {
-
 	//stats.begin();
 
 	// Animate CreateJS
@@ -181,7 +182,7 @@ function animate() {
 	}
 
 	// Update VR headset position and apply to camera.
-	controls.update();
+	if (controls) controls.update();
 
 	// Render the scene through the VREffect, but only if it's in VR mode.
 	/*if(vrmgr.isVRMode()) {
@@ -205,7 +206,7 @@ function animate() {
 // Listen for keyboard event and zero positional sensor on appropriate keypress.
 function onKey(event) {
     if (event.keyCode == 90) { // z
-        controls.zeroSensor();
+        controls.resetSensor();
     }
 };
 window.addEventListener('keydown', onKey, true);
