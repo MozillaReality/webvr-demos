@@ -46,6 +46,15 @@
       "url": "http://mozvr.com"
     },
     {
+      "description": "A selection of panorama photography.",
+      "icon": "",
+      "name": "Panorama Viewer",
+      "tagline": "Site",
+      "type": "Full-VR WebGL",
+      "path": "/panorama/",
+      "url": "http://mozvr.github.io/panorama-viewer/"
+    },
+    {
       "description": "Heavy site with lots of content",
       "icon": "",
       "name": "CNN.com",
