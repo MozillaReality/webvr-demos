@@ -70,6 +70,15 @@
       "type": "Full-VR WebGL",
       "path": "/vihart/monkeys.html",
       "url": "http://mozvr.com/projects/monkeys"
+    },
+    {
+      "description": "Coverage of Nepal’s devastating 7.8 magnitude quake in April.",
+      "icon": "",
+      "name": "Nepal Quake",
+      "tagline": "Video",
+      "type": "Full-VR WebGL",
+      "path": "/nepal/",
+      "url": "http://www.ryot.org/nepal-vr-disaster-virtual-reality"
     }
   ]
 }
