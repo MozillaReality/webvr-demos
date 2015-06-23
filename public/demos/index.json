@@ -61,6 +61,15 @@
       "tagline": "Site",
       "type": "Classic",
       "url": "http://cnn.com"
+    },
+    {
+      "description": "A weird and wonderful visualization of seamlessly-linked primates.",
+      "icon": "",
+      "name": "Monkeys",
+      "tagline": "Site",
+      "type": "Full-VR WebGL",
+      "path": "/vihart/monkeys.html",
+      "url": "http://mozvr.com/projects/monkeys"
     }
   ]
 }
