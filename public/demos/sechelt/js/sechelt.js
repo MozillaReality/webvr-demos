@@ -201,7 +201,6 @@ function init() {
 		scene.add(object);
 
 		// sounds
-		/*
 		var listener = new THREE.AudioListener();
 		camera.add( listener );
 
@@ -210,6 +209,7 @@ function init() {
 		sound.position.set( 475, 50, 850 );
 		sound.setLoop( true );
 		sound.setRefDistance( 100 );
+		sound.autoplay = true;
 		scene.add( sound );
 
 		var sound = new THREE.Audio( listener );
@@ -217,6 +217,7 @@ function init() {
 		sound.position.set( 10, 50, -200 );
 		sound.setLoop( true );
 		sound.setRefDistance( 100 );
+		sound.autoplay = true;
 		scene.add( sound );
 
 		var sound = new THREE.Audio( listener );
@@ -224,8 +225,8 @@ function init() {
 		sound.position.set( -30, 0, -750 );
 		sound.setLoop( true );
 		sound.setRefDistance( 100 );
+		sound.autoplay = true;
 		scene.add( sound );
-		*/
 
 		// camera path
 		var loader = new THREE.C4DCurveLoader();
