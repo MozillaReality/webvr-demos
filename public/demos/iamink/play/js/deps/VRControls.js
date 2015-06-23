@@ -79,11 +79,11 @@ THREE.VRControls = function ( object, onError ) {
 
 			}
 
-			if ( state.position !== null ) {
+			// if ( state.position !== null ) {
 
-				object.position.copy( state.position ).multiplyScalar( scope.scale );
+			// 	object.position.copy( state.position ).multiplyScalar( scope.scale );
 
-			}
+			// }
 
 		}
 
