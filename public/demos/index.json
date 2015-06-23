@@ -55,12 +55,12 @@
       "url": "http://mozvr.github.io/panorama-viewer/"
     },
     {
-      "description": "Heavy site with lots of content",
+      "description": "We're building a better Internet",
       "icon": "",
-      "name": "CNN.com",
+      "name": "Mozilla.org",
       "tagline": "Site",
       "type": "Classic",
-      "url": "http://cnn.com"
+      "url": "https://www.mozilla.org/en-US/"
     },
     {
       "description": "A weird and wonderful visualization of seamlessly-linked primates.",
