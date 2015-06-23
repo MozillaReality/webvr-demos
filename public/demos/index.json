@@ -14,7 +14,7 @@
       "icon": "http://mozvr.com/projects/polarsea/project-thumb.png",
       "name": "Polar Sea",
       "tagline": "Video",
-      "type": "Full-VR WebGL",
+      "type": "360 Video",
       "path": "/polarsea/",
       "url": "http://mozvr.com/projects/polarsea/content/"
     },
@@ -42,7 +42,6 @@
       "name": "MozVR.com",
       "tagline": "Site",
       "type": "Classic",
-      "path": "/mozvr-site/",
       "url": "http://mozvr.com"
     },
     {
@@ -76,7 +75,7 @@
       "icon": "",
       "name": "Nepal Quake",
       "tagline": "Video",
-      "type": "Full-VR WebGL",
+      "type": "360 Video",
       "path": "/nepal/",
       "url": "http://www.ryot.org/nepal-vr-disaster-virtual-reality"
     }
