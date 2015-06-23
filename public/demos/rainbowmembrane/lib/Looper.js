@@ -124,7 +124,6 @@
 
   Looper.prototype.everyLoop = function( callback ){
 
-    console.log('YUPE');
     this.everyLoopArray.push( callback );
 
   }
@@ -174,7 +173,6 @@
 
     for( var i = 0; i < this.everyLoopArray.length; i++ ){
 
-      console.log( 'every loop' );
       this.everyLoopArray[i]();
 
     }
@@ -188,7 +186,6 @@
 
   Looper.prototype._onNewMeasure = function(){
 
-    console.log( 'sss');
     this.oMeasure = this.measure;
     this.measure +=1;
     this.measureStartTime = this.measure * this.measureLength;

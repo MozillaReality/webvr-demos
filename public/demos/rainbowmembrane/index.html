@@ -261,18 +261,18 @@
         //scene.fog = new THREE.Fog( 0x000000 , 1000, 40000 );
 
 
-        loadCube = new THREE.Mesh( 
-            new THREE.BoxGeometry( .04 , .04 , .04 ),
-            new THREE.MeshNormalMaterial()
-        );
+        // loadCube = new THREE.Mesh( 
+        //     new THREE.BoxGeometry( .04 , .04 , .04 ),
+        //     new THREE.MeshNormalMaterial()
+        // );
 
-        loadCube.scale.x = .1;
-        loadCube.scale.y = .1;
-        loadCube.scale.z = .1;
-        //loadCube.scale.x = 1;
-        loadCube.position.z = -.1;
+        // loadCube.scale.x = .1;
+        // loadCube.scale.y = .1;
+        // loadCube.scale.z = .1;
+        // //loadCube.scale.x = 1;
+        // loadCube.position.z = -.1;
 
-        scene.add( loadCube );
+        // scene.add( loadCube );
 
         
         var g = new THREE.IcosahedronGeometry(.005 , 1 );
@@ -417,7 +417,7 @@
 
 
         // Get the load cube out of here
-        scene.remove( loadCube );
+        // scene.remove( loadCube );
 
       }
 
@@ -428,7 +428,6 @@
         //if( counter ==  0 ){
           
           if( VR == true ){
-            console.log('yup');
             controls.update();
           }
 
@@ -456,9 +455,9 @@
 
           }else{
   
-            loadCube.rotation.x +=  G.dT.value;
-            loadCube.rotation.y -= .4 * G.dT.value;
-            loadCube.rotation.z += 2. * G.dT.value;
+            // loadCube.rotation.x +=  G.dT.value;
+            // loadCube.rotation.y -= .4 * G.dT.value;
+            // loadCube.rotation.z += 2. * G.dT.value;
 
           }
 
@@ -613,9 +612,9 @@
         
         loaded ++;
 
-        loadCube.scale.x = (loaded / neededToLoad) * 1
-        loadCube.scale.y = (loaded / neededToLoad) * 1
-        loadCube.scale.z = (loaded / neededToLoad) * 1
+        // loadCube.scale.x = (loaded / neededToLoad) * 1
+        // loadCube.scale.y = (loaded / neededToLoad) * 1
+        // loadCube.scale.z = (loaded / neededToLoad) * 1
        
          
         if( loaded == neededToLoad ){

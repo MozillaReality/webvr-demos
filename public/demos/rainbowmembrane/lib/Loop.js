@@ -76,7 +76,7 @@ Loop.prototype.update = function(){
 		
   Loop.prototype.play = function(){
     this.playing = true;
-     console.log( 'HELLOS');
+     
     this.source.start();
  
     // Creates a new source for the audio right away
