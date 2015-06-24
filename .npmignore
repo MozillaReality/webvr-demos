@@ -1,0 +1,5 @@
+.DS_Store
+node_modules
+npm-debug.log
+public/demos/polarsea/videos/
+public/demos/mozvr-site
