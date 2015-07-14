@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>Child</title>
+
+		<!--
+		music video game for VR, by Vi Hart
+
+		uses three.js, Mozilla's webVR basics, and Andrea Hawksley's webVR navigation.
+		 -->
+
+		<meta charset="utf-8">
+		<meta name="viewmode" content="projection=stereo">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+		<audio id='music' src="media/child1.ogg" autoplay=true loop=true/>
+		<audio id='music2' src="media/child2.ogg" autoplay=true loop=true/>
+		<audio id='child3' src="media/child3.ogg" autoplay=true loop=true/>
+		<audio id='teeth' src="media/teeth_and_clicks.ogg" >
+		<audio id='bing' src="media/bing.ogg" >
+		<audio id='fishNoise' src="media/fishNoise.ogg" >
+		<audio id='cube1' src="media/cube1.ogg" >
+		<audio id='cube2' src="media/cube2.ogg" >
+		<audio id='cube3' src="media/cube3.ogg" >
+		<audio id='cube4' src="media/cube4.ogg" >
+		<audio id='cube5' src="media/cube5.ogg" >
+		<audio id='cube6' src="media/cube6.ogg" >
+		<audio id='cube7' src="media/cube7.ogg" >
+		<audio id='cube8' src="media/cube8.ogg" >
+		<audio id='cube9' src="media/cube9.ogg" >
+		<audio id='cube10' src="media/cube10.ogg" >
+		<audio id='cube11' src="media/cube11.ogg" >
+		<audio id='cube12' src="media/cube12.ogg" >
+		<audio id='cubeUp1' src="media/cubeUp1.ogg" >
+		<audio id='cubeUp2' src="media/cubeUp2.ogg" >
+		<audio id='cubeUp3' src="media/cubeUp3.ogg" >
+		<audio id='cubeUp4' src="media/cubeUp4.ogg" >
+		<audio id='cubeUp5' src="media/cubeUp5.ogg" >
+		<audio id='cubeUp6' src="media/cubeUp6.ogg" >
+		<audio id='cubeUp7' src="media/cubeUp7.ogg" >
+		<audio id='cubeUp8' src="media/cubeUp8.ogg" >
+		<audio id='cubeUp9' src="media/cubeUp9.ogg" >
+		<audio id='cubeUp10' src="media/cubeUp10.ogg" >
+		<audio id='cubeUp11' src="media/cubeUp11.ogg" >
+		<audio id='cubeUp12' src="media/cubeUp12.ogg" >
+	</body>
+
+	<!--
+	three.js 3d library
+	-->
+	<script src="js/lib/three.min.js"></script>
+
+	<!--
+	library for fast quaternion rotation
+	-->
+	<script src="js/lib/gl-matrix.js"></script>
+
+	<!--
+	VRControlsPlus adds rotation and movement controls that move and rotate the world relative to the camera, using arrow keys, WASD, plus interaction controls.
+	 -->
+	<script src="js/vr/PhoneVR.js"></script>
+	<script src="js/vr/VRControls.js"></script>
+	
+	<!--
+	tapMove makes it so that you move forward at a speed based on where on screen you tap
+	-->
+	<script src="js/tapMove.js"></script>
+
+	<!--
+	VREffect.js handles stereo camera setup and rendering.
+	-->
+	<script src="js/vr/VREffect.js"></script>
+
+
+	<script>
+		var renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setClearColor( 0x000000, 1 );
+		/*
+		Append the canvas element created by the renderer to document body element.
+		*/
+		document.body.appendChild( renderer.domElement );
+		/*
+		Create a three.js scene
+		*/
+		var scene = new THREE.Scene();
+		/*
+		Create a three.js camera
+		*/
+		var camera = new THREE.PerspectiveCamera( 110, window.innerWidth / window.innerHeight, 1, 10000 );
+		/*
+		Apply VR headset positional data to camera.
+		*/
+		var controls = new THREE.VRControls( camera );
+		/*
+		Apply VR stereo rendering to renderer
+		*/
+		var effect = new THREE.VREffect( renderer );
+		effect.setSize( window.innerWidth, window.innerHeight );
+
+		var t = 0;
+		var snowFloor = -40;
+		var foundLight = 0;
+		var lightPlace = new THREE.Vector3(Math.r)
+		var music = document.querySelector('#music');
+  		var music2 = document.querySelector('#music2');
+  		var child3 = document.querySelector('#child3');
+		child3.volume = 0; //so that it plays on click on phones but has no volume until needed.
+  		var teeth = document.querySelector('#teeth');
+  		var bing = document.querySelector('#bing');
+  		var fishNoise = document.querySelector('#fishNoise');
+  		var cubeSfx = [
+  			document.querySelector('#cube1'),
+  			document.querySelector('#cube2'),
+  			document.querySelector('#cube3'),
+  			document.querySelector('#cube4'),
+  			document.querySelector('#cube5'),
+  			document.querySelector('#cube6'),
+  			document.querySelector('#cube7'),
+  			document.querySelector('#cube8'),
+  			document.querySelector('#cube9'),
+  			document.querySelector('#cube10'),
+  			document.querySelector('#cube11'),
+  			document.querySelector('#cube12'),
+  			document.querySelector('#cubeUp1'),
+  			document.querySelector('#cubeUp2'),
+  			document.querySelector('#cubeUp3'),
+  			document.querySelector('#cubeUp4'),
+  			document.querySelector('#cubeUp5'),
+  			document.querySelector('#cubeUp6'),
+  			document.querySelector('#cubeUp7'),
+  			document.querySelector('#cubeUp8'),
+  			document.querySelector('#cubeUp9'),
+  			document.querySelector('#cubeUp10'),
+  			document.querySelector('#cubeUp11'),
+  			document.querySelector('#cubeUp12'),]
+
+  		var wanderTime = 0;
+  		var newPos = new THREE.Vector3(0,0,0);
+  		var boing = 0;
+  		var fishy = 1;
+
+		camera.position.y = -30;
+  		music2.volume = 0;
+
+		//make particles
+		var particles = new THREE.Geometry();
+		var partCount = 1500;
+
+		for (var p = 0; p<partCount; p++){
+			var part = new THREE.Vector3(
+		      	120*Math.random() - 80,
+		      	95*Math.random() + snowFloor,
+		      	120*Math.random() - 80
+				);
+			part.velocity = new THREE.Vector3(
+				Math.random()/10,
+				-Math.random()*0.2,
+				Math.random()*.09);
+			particles.vertices.push(part);
+		}
+
+		var partMat = new THREE.PointCloudMaterial({
+				color: 0xffffff,
+				size: 1.5,
+				map: THREE.ImageUtils.loadTexture("media/starflake.png"),
+				blending: THREE.AdditiveBlending,
+				transparent: true
+				});
+		var particleSystem = new THREE.PointCloud(particles, partMat);
+
+		particleSystem.sortParticles = true;
+		scene.add(particleSystem);
+
+		//dodecahedra
+
+		//special dodecahome
+		var dodecahome = new THREE.Mesh(
+			new THREE.DodecahedronGeometry(14),
+			new THREE.MeshLambertMaterial());
+		dodecahome.position.y = camera.position.y;
+		while (dodecahome.position.distanceTo(camera.position) < 20){
+			dodecahome.position.set(
+					Math.random()*100 -50,
+					camera.position.y,
+					Math.random()*100 -50);
+		}
+		dodecahome.material.side = THREE.DoubleSide;
+		scene.add(dodecahome);
+
+		//make dodecahome particles
+		var particles2 = new THREE.Geometry();
+		var partCount2 = 20;
+
+		for (var p = 0; p<partCount2; p++){
+			var part = new THREE.Vector3(
+		      	7*Math.random() - 3.5,
+		      	camera.position.y + Math.random()*4 - 3,
+		      	7*Math.random() - 3.5
+				);
+			part.velocity = new THREE.Vector3(
+				0,
+				-Math.random()*0.2,
+				0);
+			particles2.vertices.push(part);
+		}
+
+		var partMat2 = new THREE.PointCloudMaterial({
+				color: 0xffffff,
+				size: 10,
+				map: THREE.ImageUtils.loadTexture("media/tallParticle.png"),
+				blending: THREE.AdditiveBlending,
+				transparent: true
+				});
+		var particleSystem2 = new THREE.PointCloud(particles2, partMat2);
+
+
+		particleSystem2.sortParticles = true;
+		scene.add(particleSystem2);
+
+		particleSystem2.position.x = dodecahome.position.x;
+		particleSystem2.position.z = dodecahome.position.z;
+
+		//other dodecahedra
+		var dodecArray = [];
+		var dodecCount = 140;
+		var dodecGeom = new THREE.DodecahedronGeometry(1);
+		var dodecMat = new THREE.MeshLambertMaterial();
+		var size = 0;
+
+		for (var p = 0; p<dodecCount; p++){
+			dodecArray[p] = new THREE.Mesh(dodecGeom, dodecMat);
+			dodecArray[p].position.set(
+				Math.random()*100 -50,
+				Math.random()*18 -44,
+				Math.random()*100 -50);
+			if (dodecArray[p].position.distanceTo(camera.position) < 10 || dodecArray[p].position.distanceTo(dodecahome.position) < 9){
+				dodecArray[p].position.z += 20;
+			}
+			size = Math.random()*8;
+			dodecArray[p].scale.set(size, size, size);
+			scene.add(dodecArray[p]);
+		}
+
+
+		//sign
+
+		var infoText = THREE.ImageUtils.loadTexture( "media/arrows-sound.png" );
+		var signMat = new THREE.MeshLambertMaterial({map: infoText, color: 0xffffff});
+		var sign = new THREE.Mesh(dodecGeom, signMat);
+
+		sign.position.set(-0.5, -31, -2);
+		sign.rotation.y = 2;
+		scene.add(sign);
+
+		//icosahedra
+
+		var icosArray = [];
+		var icosCount = 30;
+		var icosGeom = new THREE.IcosahedronGeometry(1);
+		var icosMat = new THREE.MeshLambertMaterial({wireframe:true});
+
+		for (var p = 0; p<icosCount; p++){
+			icosArray[p] = new THREE.Mesh(icosGeom, icosMat);
+			icosArray[p].position.set(
+				Math.random()*120 -60,
+				Math.random()*10 -30,
+				Math.random()*120 -60);
+			size = Math.random()*20;
+			icosArray[p].scale.set(size, size, size);
+			scene.add(icosArray[p]);
+		}
+
+		//cubes
+		var cubeSpot = new THREE.Vector3();
+		while (cubeSpot.distanceTo(camera.position) < 50 || cubeSpot.distanceTo(dodecahome.position) < 25){
+			cubeSpot = new THREE.Vector3(
+			Math.random()*120 - 60,
+			camera.position.y,
+			Math.random()*120 - 60);
+		}
+
+		var cubeArray = [];
+		var cubeCount = 12;
+
+		for (var p = 0; p<cubeCount; p++){
+			cubeArray[p] = new THREE.Mesh(
+				new THREE.BoxGeometry(4,4,4,4,6+Math.floor(Math.random()*90),4),
+				new THREE.MeshLambertMaterial({wireframe:true}));
+			cubeArray[p].material.color.setRGB(Math.random()+.5, Math.random()/2 + .2, Math.random()+.3);
+			cubeArray[p].position.y = cubeSpot.y;
+			cubeArray[p].position.x = cubeSpot.x + 4*Math.floor(Math.random()*4);
+			cubeArray[p].position.z = cubeSpot.z + 4*Math.floor(Math.random()*4);
+			if (Math.random() < .16){
+				cubeArray[p].position.x *= -1;
+				cubeArray[p].position.z *= -1;
+			}
+			scene.add(cubeArray[p]);
+		}
+
+		//tetrahedron
+		var tet = new THREE.Mesh(
+			new THREE.TetrahedronGeometry(1),
+			new THREE.MeshLambertMaterial({color: 0xff0000})
+			);
+		tet.position.y = camera.position.y;
+		while (tet.position.distanceTo(camera.position) < 10 || tet.position.distanceTo(cubeSpot)<10 || tet.position.distanceTo(dodecahome.position) < 15){
+			tet.position.set(
+				Math.random()*80 - 40,
+				-30,
+				Math.random()*80 - 40);
+		}
+		scene.add(tet);
+
+		//flocktahedra
+		var octFlock = new THREE.Object3D();
+		var octArray = [];
+		var octCount = 8;
+		var octVelocity = [];
+
+		for (var i = 0; i<octCount; i++){
+			octArray[i] = new THREE.Mesh(
+				new THREE.OctahedronGeometry(Math.random()),
+				new THREE.MeshLambertMaterial({wireframe: true, wireframeLinewidth: (10*Math.random())})
+				);
+			octArray[i].material.color.setRGB(0, Math.random(), Math.random());
+			octArray[i].position.set(
+				Math.random()*2 - 1,
+				Math.random()*2 - 1,
+				Math.random()*2 - 1);
+			octVelocity[i] = Math.random();
+			octFlock.add(octArray[i]);
+			}
+		octFlock.position.set(
+			50*Math.random(),
+			camera.position.y,
+			-50*Math.random()
+			);
+		scene.add(octFlock);
+
+
+		//special winning icosahedron
+
+		var win = new THREE.Object3D();
+
+		var icosign = new THREE.Mesh(
+			new THREE.IcosahedronGeometry(1),
+			new THREE.MeshLambertMaterial({wireframe:true, wireframeLinewidth: 2})
+			);
+		win.add(icosign);
+
+		//special icosahedron vertices
+
+		var icosignVertex = [];
+
+		for (var i = 0; i<12; i++){
+			icosignVertex[i] = new THREE.Mesh(
+				new THREE.BoxGeometry(.01, .01, .01),
+				new THREE.MeshLambertMaterial({color: cubeArray[i].material.color})
+				);
+			icosignVertex[i].position.set(
+				icosign.geometry.vertices[i].x,
+				icosign.geometry.vertices[i].y,
+				icosign.geometry.vertices[i].z
+				);
+			win.add(icosignVertex[i]);
+		}
+
+		var icosignFace = [];
+
+		for (var i = 0; i<20; i++){
+			icosignFace[i] = new THREE.Mesh(
+				new THREE.TetrahedronGeometry(.1),
+				new THREE.MeshLambertMaterial({color: 0xff3333})
+				);
+			icosignFace[i].geometry.vertices[3].set(
+				(icosign.geometry.vertices[icosign.geometry.faces[i].a].x
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].b].x
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].x)/3
+				+icosign.geometry.faces[i].normal.x/3,
+
+				(icosign.geometry.vertices[icosign.geometry.faces[i].a].y
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].b].y
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].y)/3
+				+icosign.geometry.faces[i].normal.y/3,
+
+				(icosign.geometry.vertices[icosign.geometry.faces[i].a].z
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].b].z
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].z)/3
+				+icosign.geometry.faces[i].normal.z/3
+				);
+			icosignFace[i].geometry.vertices[0].set(
+				((icosign.geometry.vertices[icosign.geometry.faces[i].a].x
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].b].x)/2
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].x)/2,
+
+				((icosign.geometry.vertices[icosign.geometry.faces[i].a].y
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].b].y)/2
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].y)/2,
+
+				((icosign.geometry.vertices[icosign.geometry.faces[i].a].z
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].b].z)/2
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].z)/2
+				);
+			icosignFace[i].geometry.vertices[1].set(
+				((icosign.geometry.vertices[icosign.geometry.faces[i].b].x
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].x)/2
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].a].x)/2,
+
+				((icosign.geometry.vertices[icosign.geometry.faces[i].b].y
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].y)/2
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].a].y)/2,
+
+				((icosign.geometry.vertices[icosign.geometry.faces[i].b].z
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].z)/2
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].a].z)/2
+				);
+			icosignFace[i].geometry.vertices[2].set(
+				((icosign.geometry.vertices[icosign.geometry.faces[i].a].x
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].x)/2
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].b].x)/2,
+
+				((icosign.geometry.vertices[icosign.geometry.faces[i].a].y
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].y)/2
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].b].y)/2,
+
+				((icosign.geometry.vertices[icosign.geometry.faces[i].a].z
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].c].z)/2
+				+ icosign.geometry.vertices[icosign.geometry.faces[i].b].z)/2
+				);
+			icosignFace[i].material.visible = false;
+			icosignFace[i].frustumCulled = false;
+			win.add(icosignFace[i]);
+		}
+
+		win.position.set(-3, camera.position.y, -3);
+		scene.add(win);
+
+		//create light
+		var light = new THREE.SpotLight( 0xffffff, .8, 800);
+		light.position.set( -50,20,.1);
+		light.castShadow = true;
+		scene.add( light );
+
+		var light2 = new THREE.SpotLight( 0xffffff, .4, 600);
+		light2.position.set( 30,10,40);
+		light2.castShadow = true;
+		scene.add( light2 );
+
+		var light3 = new THREE.SpotLight( 0xffffff, .2, 500);
+		light3.position.set( -10,15,20);
+		light3.castShadow = true;
+		scene.add( light3 );
+
+		var fishLight =new THREE.PointLight( 0x88ffff, .8, 5);
+		scene.add(fishLight);
+
+		var cubeLight =new THREE.PointLight( 0xffaaee, .9, 35);
+		cubeLight.position.x = cubeSpot.x + 12;
+		cubeLight.position.y = cubeSpot.y;
+		cubeLight.position.z = cubeSpot.z + 12;
+		scene.add(cubeLight);
+
+		var boingLight =new THREE.PointLight( 0xff4400, .6, 10);
+		boingLight.position.set(tet.position.x,tet.position.y,tet.position.z);
+		scene.add(boingLight);
+
+		var dodecLight =new THREE.PointLight( 0x0000ff, .25, 15);
+		dodecLight.position.set(dodecahome.position.x, dodecahome.position.y+2, dodecahome.position.z-2);
+		dodecLight.castShadow = true;
+		scene.add(dodecLight);
+
+		var dodecLight2 =new THREE.PointLight( 0xff0000, .3, 15);
+		dodecLight2.position.set(dodecahome.position.x, dodecahome.position.y-2, dodecahome.position.z+2);
+		dodecLight2.castShadow = true;
+		scene.add(dodecLight2);
+
+		var goldLight = new THREE.PointLight( 0xffdd00, .6, 10);
+		goldLight.position.y = camera.position.y;
+		while (goldLight.position.distanceTo(camera.position) < 15 || goldLight.position.distanceTo(tet.position) < 10 || goldLight.position.distanceTo(cubeSpot) < 10 || goldLight.position.distanceTo(dodecahome.position) < 14){
+			goldLight.position.set(
+			Math.random()*100 -50,
+			Math.random()*18 -44,
+			Math.random()*100 -50);
+		}
+		goldLight.castShadow = false;
+		scene.add( goldLight );
+
+		var winLight = new THREE.PointLight( 0xffffdd, .5, 25);
+		winLight.position.set(win.position.x, win.position.y, win.position.z);
+		scene.add(winLight);
+
+		var partVector = new THREE.Vector3;
+		var boingVector = new THREE.Vector3;
+
+		var fishyWin1 = false;
+		var fishyWin2 = false;
+		var cubeWin = 0;
+		var lightWin = false;
+		var dodecWin = false;
+		var boingWin = false;
+		var winAll = false;
+		var winTimer = 0;
+		var theEnd = false;
+
+		function animate() {
+
+			win.rotation.y += .002;
+			//win states
+			if (fishyWin1){//find fish
+				icosign.material.wireframeLinewidth = 5;
+				icosign.material.color.set(0x88ccff);
+			}
+			if (fishyWin2){//get fishy=1
+			icosign.material.wireframeLinewidth = 10;
+			icosign.material.color.set(0x0055ff);
+			}
+			if (boingWin == true){ //one spikey face per boing
+				for (var i = 0; i < 20; i++){
+					icosignFace[i].material.visible = true;
+				}
+			}
+			if (dodecWin && !winAll){
+				win.scale.set(5, 5, 5);
+				winLight.distance = 35;
+			}
+			if (lightWin == false && foundLight == 1){//while winning, stops when won
+				if (foundLight = 2){
+					lightWin = true;
+				}
+			}
+			if (fishyWin2 == true && boingWin == true && dodecWin == true && lightWin == true && cubeWin > 11 ){
+				winAll = true;
+			}
+			if (winAll == true && camera.position.distanceTo(win.position)<2){
+				theEnd = true;
+			}
+			if(theEnd == true && winTimer < 6){
+				winTimer += .0005;
+				win.scale.set(2*winTimer+5, 2*winTimer+5, 2*winTimer+5);
+				win.position.y += winTimer/500;
+				light.distance += 2;
+				light2.distance += 2;
+				light3.distance += 2;
+				winLight.position.set(win.position.x, win.position.y, win.position.z);
+				var dimmer = Math.max(.2, 1 - winTimer*8)
+				particleSystem.material.color.setRGB(dimmer,dimmer,dimmer);
+				light3.intensity = dimmer;
+				light2.intensity = dimmer;
+				light.intensity = dimmer;
+				teeth.play();
+				music.muted = true;
+				music2.muted = true;
+				child3.muted = true;
+				fishNoise.muted = true;
+				bing.muted = true;
+			}
+			if(theEnd == true){
+				for (var i = 0; i<dodecArray.length; i++){
+					dodecArray[i].position.x += dodecArray[i].position.x * .00015;
+					dodecArray[i].position.z += dodecArray[i].position.z * .00015;
+				}
+				for (var i=0; i<icosArray.length; i++){
+					icosArray[i].position.x += icosArray[i].position.x * .0002;
+					icosArray[i].position.z += icosArray[i].position.z * .0002;
+					icosArray[i].position.y += icosArray[i].position.y * .0002;
+				}
+				sign.position.y -= .003;
+			}
+
+
+			//cube stretch stuff
+			for (var i = 0; i<cubeCount; i++){
+				if ( camera.position.distanceTo(cubeArray[i].position) < 2){
+					if ( cubeArray[i].geometry.heightSegments/4 > cubeArray[i].scale.y){
+						cubeSfx[i+cubeCount].play();
+						cubeArray[i].scale.y += .05;
+						if (icosignVertex[i].scale.x = .01){
+							icosignVertex[i].scale.set(10,10,10);
+							cubeWin += 1;
+						}
+					}
+				} else {
+					if ( cubeArray[i].scale.y > 1){
+						cubeSfx[i].volume = Math.min(1, 2/cubeArray[i].position.distanceTo(camera.position));
+						cubeSfx[i].play();
+						cubeArray[i].scale.y -= .004;
+					}
+				}
+			}
+
+			//octoFlock
+			for (var i = 0; i<octCount; i++){
+				octArray[i].position.y += Math.sin(t*5*octVelocity[i])/50;
+				octArray[i].position.x += Math.sin(t*10*octVelocity[i])/100;
+				octArray[i].position.z += Math.cos(t*10*octVelocity[i])/100;
+			}
+			octFlock.position.x += Math.sin(t)/16;
+			octFlock.position.z += Math.cos(t)/16 + Math.sin(t/3)/18;
+			fishLight.position.set(octFlock.position.x,octFlock.position.y,octFlock.position.z);
+
+			if(camera.position.distanceTo(octFlock.position)<10 && !winAll){ //octfish react
+				fishy = Math.max(0, fishy - .001); //fishy starts at 1 and goes to 0
+				particleSystem.material.color.setRGB(fishy,fishy,1);
+				fishNoise.play();
+				fishyWin1 = !fishyWin2;
+				if (fishy < .4){
+					fishyWin2 = true;
+				}
+			} else if (fishy < 1) { //go back to normal once out of range
+				fishy += .004;
+				particleSystem.material.color.setRGB(fishy,fishy,1);
+			}
+			if (octFlock.position.distanceTo(dodecahome.position)<14.5){
+					octFlock.position.x += 12;
+					octFlock.position.z += 12;
+			}
+
+			//boinging tetrahedron
+			tet.rotation.y += .005;
+
+			if(camera.position.distanceTo(tet.position)<1.5){ //boing if close
+				bing.play();
+				boing = 3;
+				boingWin =true;
+			}
+			if (boing>0){ //boing backwards briefly
+				var boingVector = new THREE.Vector3(0,0,-1).applyQuaternion(camera.quaternion);
+				var boingness = boingVector.multiplyScalar(.1);
+				camera.position.sub(boingness);
+				boingLight.distance = boing*10 + 4
+				boing -= .05;
+			}
+
+			t += .01;
+
+			light.position.x += Math.sin(t); //roving white lights
+			light.position.z += Math.cos(t);
+			light2.position.x += Math.sin(t)*1.5;
+			light2.position.z += Math.cos(t)*1.5;
+			light3.position.x += Math.sin(t)*2.5;
+			light3.position.z += Math.cos(t)*2.5;
+
+			//light gamification
+			if ( foundLight == 0){ //haven't found the gold light
+				goldLight.intensity += Math.sin(t)/200;
+				goldLight.distance += .001;
+				music2.volume = (99*music2.volume + .00001)/100;
+				music.volume = (99*music.volume + .999)/100;
+				if ( goldLight.position.distanceTo(camera.position) < goldLight.distance
+					&& !winAll){
+					foundLight = 1;
+				}
+			} else if (foundLight == 1){ //found the light, make it glow
+				music.volume = (99*music.volume + .000001)/100;
+				music2.volume = (99*music2.volume + .999)/100;
+				particleSystem.material.color.setRGB(1,1,1.6-goldLight.intensity);
+				goldLight.intensity += .005;
+				goldLight.distance += .7;
+				if (goldLight.intensity > 2.5){
+					goldLight.distance = (19 * goldLight.distance + 12) / 20;
+					if (goldLight.intensity > 4){
+						newPos.set(
+							Math.random()*100 -50,
+							Math.random()*18 -44,
+							Math.random()*100 -50);
+						foundLight = 2;
+					}
+				}
+			} else if (foundLight == 2){ //light starts wandering
+				goldLight.distance = 12;
+				goldLight.position.x += Math.sin(t/2)*Math.random()/4;
+				goldLight.position.z += Math.cos(t/2)*Math.random()/4;
+				music2.volume = Math.min(1, 10/goldLight.position.distanceTo(camera.position));
+				particleSystem.material.color.setRGB(1,1,1-music2.volume);
+				wanderTime += .01
+				if (wanderTime > 8){//light settles into new random place
+					goldLight.position.x = (199*goldLight.position.x + newPos.x)/200;
+					goldLight.position.z = (199*goldLight.position.z + newPos.z)/200;
+					goldLight.distance -= .005;
+					goldLight.intensity -= .004;
+				}
+				if (wanderTime > 12){//reset light
+					particleSystem.material.color.setRGB(1,1,1);
+					goldLight.distance = 10;
+					goldLight.intensity = .6;
+					foundLight = 0;
+					wanderTime = 0;
+				}
+			}
+
+			if (camera.position.y < -25){
+				snowFloor = camera.position.y - 10;
+			} else {
+				snowFloor = -35;
+			}
+
+			//animate snow particles
+			for (var p = 0; p<partCount; p++) {
+			    // check if we need to reset particles
+			    if (particles.vertices[p].y < snowFloor) {
+			      particles.vertices[p].set(
+			      	120*Math.random() - 80,
+			      	snowFloor + 95,
+			      	120*Math.random() - 80);
+			      particles.vertices[p].velocity.y = -Math.random();
+			    }
+
+			    if (foundLight == 0 ){
+		       		particles.vertices[p].velocity.x = Math.random()/10;
+		       		particles.vertices[p].velocity.y = -Math.random()*.2;
+		       		particles.vertices[p].velocity.z = Math.random()/10;
+		    	}
+
+		       	if (boing>0 && particles.vertices[p].distanceTo(tet.position) < 20){ //boing back
+		       		partVector = new THREE.Vector3(
+		       				particles.vertices[p].x,
+		       				particles.vertices[p].y,
+		       				particles.vertices[p].z);
+					particles.vertices[p].x += boing*partVector.sub(tet.position).x/400;
+					particles.vertices[p].y += boing*partVector.sub(tet.position).y/400;
+					particles.vertices[p].z += boing*partVector.sub(tet.position).z/400;
+				}
+
+				if (fishy < 1){
+					particles.vertices[p].x += Math.sin(particles.vertices[p].z/10)/(15*fishy+2);
+					particles.vertices[p].z += Math.cos(particles.vertices[p].x/10)/(15*fishy+2);
+				}
+
+				if (particles.vertices[p].distanceTo(dodecahome.position)<14.5){//avoid dodecahome
+					particles.vertices[p].velocity.y = 0;
+					particles.vertices[p].y += .2;
+				}
+
+				if (lightWin){
+					if (particles.vertices[p].distanceTo(win.position) < (2*win.scale.x - 1)){
+						particles.vertices[p].x = (9*particles.vertices[p].x + win.position.x )/10 + Math.sin(particles.vertices[p].x/20)/(20) - .05;
+						particles.vertices[p].y = (9*particles.vertices[p].y + win.position.y + 1) / 10;
+						particles.vertices[p].z = (9*particles.vertices[p].z + win.position.z -	.4) / 10;
+					}
+				}
+
+			    particles.vertices[p].y += particles.vertices[p].velocity.y;
+			    particles.vertices[p].z += particles.vertices[p].velocity.z;
+			    particles.vertices[p].x += particles.vertices[p].velocity.x;
+		 	 }
+
+			//dodecahome particles
+		 	particleSystem2.rotation.y += .005;
+		 	 for (var p = 0; p<partCount2; p++) {
+			    particles2.vertices[p].y +=  Math.sin(2*t+10*particles2.vertices[p].velocity.y)/23;
+			    particles2.vertices[p].z += Math.sin(2*t+40*particles2.vertices[p].velocity.y)/33;
+			    particles2.vertices[p].x += Math.cos(2*t+40*particles2.vertices[p].velocity.y)/33;
+		 	 }
+
+		 	if ( camera.position.distanceTo(dodecahome.position) < 16) {
+		 		music.volume = (9*music.volume + .000001)/10;
+		 		// child3.play();
+		 		if (camera.position.distanceTo(dodecahome.position) < 12){
+		 			dodecWin = true;
+		 		}
+		 	}
+		 	if (!winAll){
+			 	child3.volume = Math.min(1, 2/camera.position.distanceTo(dodecahome.position));
+			 }
+
+			tapMovement(0.8);//.8 scaled for this thing
+			controls.update();
+			effect.render( scene, camera );
+			requestAnimationFrame( animate );
+		}
+
+
+		animate();
+
+
+		document.body.addEventListener( 'click', function() {
+			effect.setFullScreen( true );
+			if (music.paused){
+		  			music.play();
+		  			music2.play();
+		  			child3.play();
+		  	}
+		});
+
+		function onkey(event) {
+	    event.preventDefault();
+
+	    if (event.keyCode == 90) { // z
+	    	controls.zeroSensor(); //zero rotation
+	    } else if (event.keyCode == 70 || event.keyCode == 13) { //f or enter
+	    	effect.setFullScreen(true) //fullscreen else if (event.keyCode == 80) {//p
+
+	  	} else if (event.keyCode == 32 || event.keyCode == 80) { //space or p
+	  		if (music.paused){
+		  			music.play();
+		  			music2.play();
+		  			teeth.muted = false;
+	  			if (!theEnd){
+		  			child3.muted = false;
+		  			bing.muted = false;
+		  			cubeUp1.muted = false;
+		  			fishNoise.muted = false;
+		  			for (var i=0; i<cubeSfx.length; i++){
+		  				cubeSfx[i].muted = false;
+		  			}
+		  		}
+	  		} else{
+	  			music.pause();
+	  			music2.pause();
+	  			child3.muted = true;
+	  			bing.muted = true;
+	  			cubeUp1.muted = true;
+	  			fishNoise.muted = true;
+	  			teeth.muted = true;
+	  			for (var i=0; i<cubeSfx.length; i++){
+	  				cubeSfx[i].muted = true;
+	  			}
+	  		}
+	  	}
+
+	  };
+
+	    window.addEventListener("keydown", onkey, true);
+
+		document.addEventListener('keydown', function(event) { key(event, 1); }, false);
+		document.addEventListener('keyup', function(event) { key(event, -1); }, false);
+
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			effect.setSize( window.innerWidth, window.innerHeight );
+		}
+		window.addEventListener( 'resize', onWindowResize, false );
+	</script>
+</html>

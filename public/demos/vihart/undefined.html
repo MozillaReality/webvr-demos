@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>[]</title>
+		<!--in celebration of a beautiful bug-->
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+
+	</body>
+
+	<!--
+	three.js 3d library
+	-->
+	<script src="js/lib/three.min.js"></script>
+
+	<!--
+	library for fast quaternion rotation
+	-->
+	<script src="js/lib/gl-matrix.js"></script>
+
+	<!--
+	VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
+	 -->
+	<script src="js/vr/PhoneVR.js"></script>
+	<script src="js/vr/VRControls.js"></script>
+
+	<!--
+	VREffect.js handles stereo camera setup and rendering.
+	-->
+	<script src="js/vr/VREffect.js"></script>
+
+	<!--font-->
+	<script src="js/lib/helvetiker.js"></script>
+
+
+	<script>
+		//rotation function by Marc ten Bosch
+        function RotateAround(object, centerX, centerY, centerZ, rotateX, rotateY, rotateZ) {
+
+
+            var center = new THREE.Vector3(centerX, centerY, centerZ);
+            var rotateEuler = new THREE.Euler(rotateX, rotateY, rotateZ);
+            var rotateMatrix = new THREE.Matrix4();
+            rotateMatrix.makeRotationFromEuler(rotateEuler);
+
+            object.position.sub(center);
+            object.position.applyMatrix4(rotateMatrix);
+            object.position.add(center);
+
+            rotateMatrix.multiply(object.matrix);
+
+            object.matrix = rotateMatrix;
+            object.rotation.setFromRotationMatrix( object.matrix );
+        }
+
+		/*
+		Setup three.js WebGL renderer
+		*/
+		var renderer = new THREE.WebGLRenderer( { antialias: true } );
+		/*
+		Append the canvas element created by the renderer to document body element.
+		*/
+		document.body.appendChild( renderer.domElement );
+		/*
+		Create a three.js scene
+		*/
+		var scene = new THREE.Scene();
+		/*
+		Create a three.js camera
+		*/
+		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+		/*
+		Apply VR headset positional data to camera.
+		*/
+		var controls = new THREE.VRControls( camera );
+		/*
+		Apply VR stereo rendering to renderer
+		*/
+		var effect = new THREE.VREffect( renderer );
+		effect.setSize( window.innerWidth, window.innerHeight );
+
+		/*
+		define interaction variables
+		*/
+		var mouseY = 1;
+		var mouseX = 1;
+		var clicky = 0;
+
+		var mytext = [];
+
+		for (var i = 0; i < 20; i++) {
+		    mytext[i] = new THREE.Mesh(
+		    	new THREE.TextGeometry(mytext[i]),
+		    	new THREE.MeshNormalMaterial());
+		  scene.add(mytext[i]);
+		}
+
+		camera.position.z=100;
+
+		/*
+		Request animation frame loop function
+		*/
+		function animate() {
+
+			if(clicky===0){
+				for( var i=0; i<mytext.length; i++){
+				RotateAround(mytext[i], -i,-i,5, .0004*i,.0005*i,.01);
+				mytext[i].material.wireframe=true;
+				}
+
+			}
+			if(clicky===1){
+				for( var i=0; i<mytext.length; i++){
+				RotateAround(mytext[i], -(mouseX)*i,-(mouseY/10)*i,5, .0004*i,.0005*i,.01);
+				}
+			}
+			if(clicky===2){
+				for( var i=0; i<mytext.length; i++){
+				mytext[i].lookAt(camera.position);
+				mytext[i].material.wireframe = false;
+				}
+			}
+			if(clicky===3){
+				for( var i=0; i<mytext.length; i++){
+				RotateAround(mytext[i], -500*i,-50*i,5, .0004*i,.0005*i,.01);
+				mytext[i].material.wireframe=true;
+				mytext[i].lookAt(camera.position);
+				}
+			}
+			if(clicky===4){
+				for (var i=0; i<mytext.length; i++){
+				if((Math.abs(mytext[i].position.x+mytext[i].position.y+mytext[i].position.z)) > 10){
+					mytext[i].position.x = Math.abs(mytext[i].position.x)-(mouseY/100);
+					mytext[i].position.y = Math.abs(mytext[i].position.y)-(mouseX/200);
+					mytext[i].position.z = Math.abs(mytext[i].position.z)-(mouseY/50);
+					} else{
+					mytext[i].position.x = 0;
+					mytext[i].position.y = 0;
+					mytext[i].position.z = 0;
+					}
+				mytext[i].lookAt(camera.position);
+				}
+
+			}
+
+
+			/*
+			Update VR headset position and apply to camera.
+			*/
+			controls.update();
+			/*
+			Render the scene through the VREffect.
+			*/
+			effect.render( scene, camera );
+			requestAnimationFrame( animate );
+		}
+		/*
+		Kick off animation loop
+		*/
+		animate();
+
+		//links
+
+		function link(){
+				window.location="http://vihart.github.io/webVR-playing-with/index.html";
+		}
+
+		//listen for mouse movement to get mouseX and mouseY
+
+		document.body.addEventListener( 'mousemove', function (event) {
+		 	mouseY = event.clientY;
+		 	mouseX = event.clientX;
+		});
+
+		//listen for click
+
+		document.body.addEventListener( 'click', function(){
+			clicky = (clicky + 1) % 5;
+			effect.setFullScreen( true );
+		})
+		
+		/*
+		Listen for keyboard events
+		*/
+		function onkey(event) {
+	    event.preventDefault();
+
+	    if (event.keyCode == 90) { // z
+	    	controls.zeroSensor(); //zero rotation
+	    } else if (event.keyCode == 70 || event.keyCode == 13) { //f or enter
+	    	effect.setFullScreen(true) //fullscreen
+	    } else if (event.keyCode == 32) {//space
+	  		link();
+	  	}
+
+
+	  };
+	  window.addEventListener("keydown", onkey, true);
+
+	  	  //hold down keys to do rotations and stuff
+		function key(event, sign) {
+		  var control = controls.manualControls[String.fromCharCode(event.keyCode).toLowerCase()];
+		  if (!control)
+		    return;
+		  if (sign === 1 && control.active || sign === -1 && !control.active)
+		    return;
+		  control.active = (sign === 1);
+		  controls.manualRotateRate[control.index] += sign * control.sign;
+		}
+		document.addEventListener('keydown', function(event) { key(event, 1); }, false);
+		document.addEventListener('keyup', function(event) { key(event, -1); }, false);
+
+		/*
+		Handle window resizes
+		*/
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			effect.setSize( window.innerWidth, window.innerHeight );
+		}
+		window.addEventListener( 'resize', onWindowResize, false );
+	</script>
+</html>

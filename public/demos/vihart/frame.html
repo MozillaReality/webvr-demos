@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>playing with webVR</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+	<audio id='music' src="media/intro.ogg" />
+	</body>
+
+	<!--
+	three.js 3d library
+	-->
+	<script src="js/lib/three.min.js"></script>
+
+		<!--rotating quaternions library-->
+	<script src="js/lib/gl-matrix.js"></script>
+
+	<!--
+	VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
+	 -->
+	<script src="js/vr/PhoneVR.js"></script>
+	<script src="js/vr/VRControls.js"></script>
+
+	<!--
+	VREffect.js handles stereo camera setup and rendering.
+	-->
+	<script src="js/vr/VREffect.js"></script>
+
+	<!--vertex shader for monkeys-->
+	<script type="x-shader/x-vertex" id="vertexShader">
+// This shader moves vertices around
+
+// Quaternion Multiplication
+vec4 quatMult( in vec4 p, in vec4 q )
+{
+    vec4 r;
+    r.w = + p.w*q.w - p.x*q.x - p.y*q.y - p.z*q.z;
+    r.x = + p.w*q.x + p.x*q.w + p.y*q.z - p.z*q.y;
+    r.y = + p.w*q.y - p.x*q.z + p.y*q.w + p.z*q.x;
+    r.z = + p.w*q.z + p.x*q.y - p.y*q.x + p.z*q.w;
+    return r;
+}
+
+// input
+uniform float time; // global time in seconds
+uniform vec4 quatPerMonkey; // quaternion that moves this monkey into 4-space, set once per monkey
+
+void main()
+{
+    // base position
+	// turn a 3D position of a monkey into a 4D position by adding a 1 as the w component then normalizing To get onto the unit 3-sphere
+	vec4 p3sphere = normalize( vec4(position.zyx, 1.0) );
+
+	// then rotate using this monkey's quaternion to place in 4D
+    vec4 p = quatMult( p3sphere, quatPerMonkey );
+    // also rotate everything over time
+    vec4 quatOverTime = normalize (vec4(1.0, sin(time), 1.0, cos(time)));
+    p = quatMult( p, quatOverTime );
+
+    // stereographic projection from 4D to 3D
+    vec3 pos3 = vec3( p.x / (1.0-p.w), -p.y / (1.0-p.w), p.z / (1.0-p.w) );
+
+	// take the final 3D position and project it onto the screen
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( pos3 + vec3(4.0,-2.0,5.0), 1.0 );
+}
+</script>
+<script type="x-shader/x-vertex" id="fragmentShader">
+void main()
+{
+    gl_FragColor = vec4(0.8,0.1,0.3, 1. );
+}
+</script>
+	<script type="text/javascript" id="mainCode">
+		/*
+		Setup three.js WebGL renderer
+		*/
+		var renderer = new THREE.WebGLRenderer( { antialias: true } );
+
+		/*
+		Append the canvas element created by the renderer to document body element.
+		*/
+		document.body.appendChild( renderer.domElement );
+
+		/*
+		Create a three.js scene
+		*/
+		var scene = new THREE.Scene();
+
+		/*
+		Create a three.js camera
+		*/
+		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+
+		/*
+		Apply VR headset positional data to camera.
+		*/
+		var controls = new THREE.VRControls( camera );
+
+		/*
+		Apply VR stereo rendering to renderer
+		*/
+		var effect = new THREE.VREffect( renderer );
+		effect.setSize( window.innerWidth, window.innerHeight );
+
+		var start = Date.now();
+		/*
+		define interaction variables
+		*/
+		var mouseY = 1;
+		var mouseX = 1;
+		var clicky = 0;
+
+		//create info overlay
+		var infoText = THREE.ImageUtils.loadTexture( "media/overlay.png" );
+		var infoMaterial = new THREE.MeshBasicMaterial( {map: infoText, wireframe: false, color: 0xffff00 });
+		var infoBox = new THREE.BoxGeometry(1,1,1);
+		var infoSprite = new THREE.Mesh( infoBox, infoMaterial );
+		infoSprite.position.z = -2;
+		infoSprite.position.x = .5;
+		infoSprite.position.y = -.5;
+		(infoSprite);
+		scene.add( infoSprite );
+
+		/*
+		Create 3d objects
+		*/
+
+		//MONKEYS
+
+		var mesh;
+	var matArray = new Array(8);
+
+	// one quaternion per monkey
+	// these are just the 8 sides of the hypercube
+	var quatPerMonkeyArray = [
+	    new THREE.Vector4(1, 0, 0, 0),
+	    new THREE.Vector4(0, 1, 0, 0),
+	    new THREE.Vector4(0, 0, 1, 0),
+	    new THREE.Vector4(0, 0, 0, 1),
+
+	    new THREE.Vector4(-1, 0, 0, 0),
+	    new THREE.Vector4(0, -1, 0, 0),
+	    new THREE.Vector4(0, 0, -1, 0),
+	    new THREE.Vector4(0, 0, 0, -1)
+	];
+
+			// material for the monkeys is a shader
+    materialBase = new THREE.ShaderMaterial({
+		// these are the parameters for the shader
+        uniforms: {
+			// global time
+            time: {
+                type: "f",
+                value: 0.0
+            },
+			// quaternion that moves this monkey into 4-space, set once per monkey
+            quatPerMonkey: {
+                type: "v4",
+                value: new THREE.Vector4( 0, 0, 0, 0 )
+            }
+        },
+        vertexShader: document.getElementById('vertexShader').textContent,
+        fragmentShader: document.getElementById('fragmentShader').textContent
+    });
+    materialBase.side = THREE.FrontSide;
+			// one material per monkey, since they have a different quaternion
+	    for (var i = 0; i < 8; i++)
+	    {
+	        matArray[i] = materialBase.clone();
+	    }
+
+	    for (var i = 0; i < 8; i++){
+	    	scene.add(new THREE.Mesh(
+	    		new THREE.OctahedronGeometry(1),
+	    		matArray[i])
+	    	);
+	    }
+
+
+		var geometry = new THREE.BoxGeometry( 15, 15, 15 );
+		var spheregeom = new THREE.SphereGeometry( 10, 10, 4 );
+		var tetgeom = new THREE.TetrahedronGeometry(10);
+
+		var material = new THREE.MeshBasicMaterial({color:0xffff00, wireframe: true});
+		var cubematerial = new THREE.MeshBasicMaterial( {color: 0x440000, wireframe: true})
+		var tetred = new THREE.MeshBasicMaterial( {color: 0x880044} );
+		var tetblue = new THREE.MeshBasicMaterial( {color: 0xff3300} );
+		var tetgreen = new THREE.MeshBasicMaterial( {color: 0xff5077} );
+		var tetyellow = new THREE.MeshBasicMaterial( {color: 0x332222} );
+		var tetcyan = new THREE.MeshBasicMaterial( {color: 0x004444} );
+
+		var cube = new THREE.Mesh( geometry, cubematerial ); //spinnycubes
+		var cube2 = new THREE.Mesh( geometry, cubematerial );
+		var cube3 = new THREE.Mesh( geometry, cubematerial );
+		var cube4 = new THREE.Mesh( geometry, cubematerial );
+		var cube5 = new THREE.Mesh( geometry, cubematerial );
+
+		var sphere = new THREE.Mesh( spheregeom, material ); //top sphere
+
+
+		//create FIT:
+		var tet = new THREE.Mesh( tetgeom, tetred );
+		var tet2 = new THREE.Mesh( tetgeom, tetblue );
+		var tet3 = new THREE.Mesh( tetgeom, tetgreen );
+		var tet4 = new THREE.Mesh( tetgeom, tetcyan );
+		var tet5 = new THREE.Mesh( tetgeom, tetyellow );
+
+		var FIT = new THREE.Object3D(); FIT.add(tet, tet2, tet3, tet4, tet5);
+		FIT.position.z = -20;
+		FIT.position.x = -15;
+		FIT.add(tet, tet2, tet3, tet4, tet5);
+		scene.add(FIT);
+
+		var t = ((1 + Math.sqrt(5))/2);
+		var fturn = 6.283/5;
+		var axis = new THREE.Vector3( t, 1, 0 );
+		axis.normalize();
+
+		tet.rotateOnAxis (axis, 0);
+		tet2.rotateOnAxis (axis, fturn);
+		tet3.rotateOnAxis (axis, 2*fturn);
+		tet4.rotateOnAxis (axis, 3*fturn);
+		tet5.rotateOnAxis (axis, 4*fturn);
+
+		//create four bouncing boxes:
+		var Things = [];
+		var boxWave = 0;
+		var thingpos = 0;
+		  for (var i = 0; i < 4; i++) {
+		    Things[i] = new THREE.Mesh(
+		      new THREE.BoxGeometry(10,10,10,10,10,10),
+		     	new THREE.MeshBasicMaterial({color:'blue'}));
+		  scene.add(Things[i]);
+		  thingpos += -10;
+		  Things[i].position.x = thingpos;
+		  Things[i].position.y = -20;
+		  Things[i].position.z = 40;
+		  }
+
+		//create pointland
+		var pointThings = [];
+		  var pointWave = 0;
+
+		  for (var i = 0; i < 9; i++) {
+		    pointThings[i] = new THREE.PointCloud(
+		    	new THREE.BoxGeometry(3,3,3),
+		    	new THREE.PointCloudMaterial(0x55ff00));
+		  scene.add(pointThings[i]);
+		  pointThings[i].position.x = ((i*6) % 18) -9;
+		  pointThings[i].position.y = -20;
+		  pointThings[i].position.z = Math.floor(i/3)*6 -9;
+		  }
+
+
+		//create exclamation point
+		var exclaim = new THREE.Mesh(
+			new THREE.BoxGeometry(1,8,1),
+			new THREE.MeshNormalMaterial({wireframe: true}));
+		exclaim.position.y = 5;
+
+		var exclaimDot = new THREE.Mesh(
+			new THREE.BoxGeometry(1,1,1),
+			new THREE.MeshNormalMaterial({wireframe: true}));
+		exclaimDot.position.y = -1;
+
+		var exclamation = new THREE.Object3D();
+		exclamation.position.x = -10;
+		exclamation.add(exclaim, exclaimDot);
+		scene.add(exclamation);
+
+
+		//red spinny cubes
+		cube2.position.x = 10;
+		cube3.position.x = 10;
+		cube4.position.x = 10;
+		cube5.position.x = 10;
+		cube2.position.z = 25;
+		cube3.position.z = 25;
+		cube4.position.z = 25;
+		cube5.position.z = 25;
+		cube2.position.y = 30;
+		cube3.position.y = 30;
+		cube4.position.y = 30;
+		cube5.position.y = 30;
+		scene.add( cube2 );
+		scene.add( cube3 );
+		scene.add( cube4 );
+		scene.add( cube5 );
+
+		//top spinny sphere
+		sphere.position.y = 30;
+		sphere.position.z = -10;
+		scene.add( sphere );
+
+		//traffic cone
+		var coneTop = new THREE.Mesh(
+			new THREE.CylinderGeometry(.3,2,5,20),
+			new THREE.MeshLambertMaterial({color: 0x221100}));
+		coneTop.position.x = 7;
+		coneTop.position.z = -5;
+		coneTop.position.y = -4.5;
+		scene.add(coneTop);
+
+		var coneBottom = new THREE.Mesh(
+			new THREE.BoxGeometry(4,.5,4),
+			new THREE.MeshLambertMaterial({color:0x221100}));
+		coneBottom.position.x = 7;
+		coneBottom.position.z = -5;
+		coneBottom.position.y = -7;
+		scene.add(coneBottom);
+
+		//create light
+		var light = new THREE.PointLight( 0xffffff, 10, 600);
+		light.position.set( -10,1,1);
+		light.castShadow = true;
+		scene.add( light );
+
+		//particles
+		var particles = new THREE.Geometry();
+		var partCount = 7;
+
+		for (var p = 0; p<partCount; p++){
+			var part = (new THREE.Vector3(15+Math.random()*5,15+Math.random()*5,-15-Math.random()*5));
+			part.velocity = new THREE.Vector3(
+				Math.random()/10,
+				Math.random()/12,
+				Math.random()/9)
+			particles.vertices.push(part);
+		}
+
+		var particleSystem = new THREE.PointCloud(
+			particles,
+			new THREE.PointCloudMaterial({
+				color: 0x333366,
+				size: 20,
+				map: THREE.ImageUtils.loadTexture("media/particle.png"),
+				blending: THREE.AdditiveBlending,
+				transparent: true
+				}));
+
+		particleSystem.sortParticles = true;
+		scene.add(particleSystem);
+
+		/*
+		Request animation frame loop function
+		*/
+		function animate() {
+
+
+			infoSprite.rotation.y += mouseX/80000;
+			infoSprite.rotation.x += clicky*(mouseY/8000)
+			infoSprite.material.color.setRGB(1,(.3 + (mouseY+200)/500),1);
+
+			/*
+			Apply rotations to meshes
+			*/
+				// send the time every frame so that we can rotate the monkeys over time
+		    for (var i = 0; i < 8; i++)
+		    {
+		        matArray[i].uniforms['quatPerMonkey'].value = quatPerMonkeyArray[i];
+		        matArray[i].uniforms['time'].value = .00025 * (Date.now() - start);
+		    }
+
+			cube2.rotation.x += 0.005+ (clicky*(mouseX/8000));
+			cube2.rotation.z += 0.007;
+			cube3.rotation.x += 0.006+ (clicky*(mouseX/8000));
+			cube3.rotation.z += 0.008;
+			cube4.rotation.x += 0.007+ (clicky*(mouseX/8000));
+			cube4.rotation.z += 0.009;
+			cube5.rotation.x += 0.008+ (clicky*(mouseX/8000));
+			cube5.rotation.z += 0.01;
+
+			sphere.rotation.x += 0.1 * !clicky;
+			sphere.rotation.y += 0.04 * !clicky;
+
+			FIT.rotation.y += .006;
+			FIT.rotation.x += .002 + (clicky*(mouseX/8000));
+
+			coneBottom.rotation.y -= .001 - clicky*(mouseX/80000);
+			coneTop.position.y += clicky * Math.sin(exclamation.rotation.y)/50;
+
+			exclamation.rotation.y += .005 + clicky*(mouseY/1000);
+			exclamation.position.y += Math.sin(exclamation.rotation.y)/100;
+
+		boxWave += .1
+		//animate blue boxes
+		  for (var i = 0; i < 4; i++) {
+		    Things[i].position.y += Math.sin(boxWave*(1/(i+2)));
+		    if (clicky === 1){
+			    Things[i].material.color.setRGB(mouseX/200,((mouseY+200)/500),1);
+			} else {
+				Things[i].material.color.setRGB(0,0,1);
+			}
+		  }
+
+		  //animate pointland
+		  for (var i = 0; i < pointThings.length; i++) {
+		    pointThings[i].position.y = Math.sin(boxWave*((1/(pointThings[i].position.x))+2)) + Math.sin(boxWave*(2/pointThings[i].position.z)) - 20;
+		    pointThings[i].material.color.setRGB((Math.abs(pointThings[i].position.y)/30),(Math.abs(pointThings[i].position.y*(1+clicky/5))/40),(Math.abs(pointThings[i].position.y)/20));
+		  }
+
+		  //animate particles
+		  for (var p = 0; p<partCount; p++){
+		  	//update velocity
+		  	particles.vertices[p].velocity.y -= (particles.vertices[p].y-20)/1000 + Math.random()/100;
+		  	particles.vertices[p].velocity.z -= (particles.vertices[p].z+20)/1200 + Math.random()/200;
+		  	particles.vertices[p].velocity.x -= (particles.vertices[p].x-20)/1300 + Math.random()/200;
+		  	//update position based on velocity
+		  	particles.vertices[p].y += particles.vertices[p].velocity.y;
+		  	particles.vertices[p].z += particles.vertices[p].velocity.z;
+		  	particles.vertices[p].x += particles.vertices[p].velocity.x;
+		  }
+
+
+			/*
+			Update VR headset position and apply to camera.
+			*/
+			controls.update();
+
+			/*
+			Render the scene through the VREffect.
+			*/
+			effect.render( scene, camera );
+
+			requestAnimationFrame( animate );
+
+		}
+
+		/*
+		Kick off animation loop
+		*/
+		animate();
+
+		//logs camera pos when h is pressed
+		function rotest(){
+			console.log(camera.rotation.x, camera.rotation.y, camera.rotation.z);
+		}
+
+		//linking function
+		function link(){
+		if((camera.rotation.x > 1.2) && (camera.rotation.x < 1.8) && (camera.rotation.y > -0.4) && (camera.rotation.y < .4)){
+			   window.location="http://vihart.github.io/webVR-playing-with/spindex.html";
+			 } else if (((camera.rotation.x < -2.5)||(camera.rotation.x > 2.4)) && (camera.rotation.y < -.5) && (camera.rotation.y > -1.2)){
+				window.location= "http://vihart.github.io/webVR-playing-with/monkeys.html";
+			} else if ((camera.rotation.x > -.5) && (camera.rotation.x < 1) && (camera.rotation.y > .3) && (camera.rotation.y < .9)) {
+				window.location= "http://vihart.github.io/webVR-playing-with/compound.html";
+			} else if (((camera.rotation.x > 2.3) || (camera.rotation.x < -2.8)) && (camera.rotation.y > 0) && (camera.rotation.y < .7)){
+				window.location= "http://vihart.github.io/webVR-playing-with/wave.html";
+			} else if ((camera.rotation.x > -2.5) && (camera.rotation.x < -1) && (camera.rotation.y > -.2) && (camera.rotation.y < .5)){
+				window.location= "http://vihart.github.io/webVR-playing-with/pointland.html";
+			} else if ((camera.rotation.x > -.1) && (camera.rotation.x < .9) && (camera.rotation.y > -.9) && (camera.rotation.y < -.2)){
+				window.location= "http://vihart.github.io/webVR-playing-with/particles.html";
+			} else if ((camera.rotation.x > -2) && (camera.rotation.x < 1.7) && (camera.rotation.y > 1.1) && (camera.rotation.y < 1.4)){
+				window.location= "http://vihart.github.io/webVR-playing-with/undefined.html";
+			} else if ((camera.rotation.x > -.7) && (camera.rotation.x < -.1) && (camera.rotation.y > -1) && (camera.rotation.y < -.7)){
+				window.location= "http://vihart.github.io/webVR-playing-with/underConstruction.html";
+			}
+
+		}
+
+		//listen for mouse movement to get mouseX and mouseY
+
+		document.body.addEventListener( 'mousemove', function (event) {
+		 	mouseY = event.clientY;
+		 	mouseX = event.clientX;
+		});
+
+		//listen for click
+
+		document.body.addEventListener( 'click', function(){
+			clicky = (clicky + 1) % 2;
+		})
+		/*
+		Listen for keyboard events zero positional sensor on appropriate keypress.
+		*/
+		function onkey(event) {
+	    event.preventDefault();
+
+	    if (event.keyCode == 90) { // z
+	    	controls.zeroSensor(); //zero rotation
+	    } else if (event.keyCode == 70 || event.keyCode == 13) { //f or enter
+	    	effect.setFullScreen(true) //fullscreen
+	    } else if (event.keyCode == 32) {//space
+	  		link();
+	  	} else if (event.keyCode === 73){ //i
+	  		infoSprite.material.visible = !infoSprite.material.visible;
+	  	// } else if (event.keyCode == 37){ //right arrow
+	  	// 	camera.rotation.x += .1; //do not know how to do this thing
+	  	// } else if (event.keyCode == 39){ //left arrow
+	  	// 	camera.rotation.x += -.1;
+	  	} else if (event.keyCode == 72) {//h
+	  		rotest();
+	  	} else if (event.keyCode == 80) {//p
+	  		var music = document.querySelector('#music');
+	  		if (music.paused){
+	  			music.play();
+	  		} else{
+	  			music.pause();
+	  		}
+	  	}
+	  };
+
+
+
+	  window.addEventListener("keydown", onkey, true);
+
+	  //hold down keys to do rotations and stuff
+		function key(event, sign) {
+		  var control = controls.manualControls[String.fromCharCode(event.keyCode).toLowerCase()];
+		  if (!control)
+		    return;
+		  if (sign === 1 && control.active || sign === -1 && !control.active)
+		    return;
+		  control.active = (sign === 1);
+		  controls.manualRotateRate[control.index] += sign * control.sign;
+		}
+		document.addEventListener('keydown', function(event) { key(event, 1); }, false);
+		document.addEventListener('keyup', function(event) { key(event, -1); }, false);
+
+		/*
+		Handle window resizes
+		*/
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+
+			effect.setSize( window.innerWidth, window.innerHeight );
+		}
+
+		window.addEventListener( 'resize', onWindowResize, false );
+
+	</script>
+</html>

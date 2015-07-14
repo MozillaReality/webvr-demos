@@ -1,0 +1,397 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>Flatworld</title>
+
+		<!--
+		4D Monkeys
+
+		interactive webVR version (by Marc ten Bosch and Vi Hart) of a 4d monkey sculpture (by Henry Segerman and Will Segerman) inspired by work on 4 dimensional symmetry groups (by Henry Segerman and Vi Hart) inspired by work on 4d graphics (by Marc ten Bosch) and 3d modeling (by Will Segerman).
+
+		http://www.marctenbosch.com
+		http://vihart.com
+		http://www.segerman.org/
+		http://www.willsegerman.com/
+
+
+		It has oculus support for webVR browsers (thanks Mozilla!)
+
+		https://github.com/MozVR/vr-web-examples/tree/master/threejs-vr-boilerplate
+
+		And WASD + E/Q navigation support both in and out of VR (thanks, Andrea Hawksley!)
+		Enter to go into VR mode, S for sound,
+		Space to click links based on camera rotation
+
+		https://github.com/hawksley
+
+		-->
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+	<audio id='music' src="media/monkeygif.mp3"/>
+
+	</body>
+
+	<!--
+	three.js 3d library
+	-->
+	<script src="js/lib/three.min.js"></script>
+
+	<!--
+	library for fast quaternion rotation
+	-->
+	<script src="js/lib/gl-matrix.js"></script>
+
+	<!--
+	VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
+	 -->
+	<script src="js/vr/PhoneVR.js"></script>
+	<script src="js/vr/VRControlsFlatWorld.js"></script>
+
+	<!--
+	VREffect.js handles stereo camera setup and rendering.
+	-->
+	<script src="js/vr/VREffect.js"></script>
+    <!-- spherical math functions -->
+    <script src="js/sphMath.js"></script>
+
+    <script src="js/loaders/OBJLoader.js"></script>
+
+    <script type="x-shader/x-vertex" id="vertexShader">
+// This shader moves vertices around
+
+
+
+// input
+uniform float time; // global time in seconds
+uniform vec3 offsetPerTile; // quaternion that moves this monkey into 4-space, set once per monkey
+uniform int fogType; // which type of fog to use
+
+// output
+
+vec3 normalColor( in vec3 nBase )
+{
+    vec3 n = normalize(nBase);
+    float x = n.x;
+    float y = n.y;
+    float z = n.z;
+
+    return vec3(x*0.5 + 0.5,y*0.5 + 0.5,z*0.5 + 0.5);
+}
+
+varying vec3 vColor; // this shader computes the color of each vertex
+
+// this gets called once per vertex of the monkey mesh (and numMonkeys times since there are numMonkeys monkeys)
+void main()
+{
+
+    vec3 pos3 = position.zyx + offsetPerTile;
+
+    gl_Position = projectionMatrix * modelViewMatrix * vec4( pos3 , 1.0 );
+
+    // vColor = vec3(0.1,0.8,0.1);
+    vColor = normalColor(normal.zyx);
+
+    // do fog
+    if ( fogType == 1 )
+    {
+        // ramp fog
+        // compute distance to camera from 0 to 1
+        float zz = gl_Position.z / gl_Position.w;
+        // go from 1 to 0 instead (0 is furthest and 1 is where the camera is )
+        // ( note that the computed distance is not linear )
+        float fogScale = 1. - zz;
+        // anything closer than 0.1 gets regular color
+        if ( fogScale > 0.1 )
+            fogScale = 1.0;
+        // everything else ramps from 0 to 1
+        else
+            fogScale = fogScale / 0.1;
+        // mutliply color by this value to make it go to black
+        vColor *= fogScale;
+    }
+    else if ( fogType == 2 )
+    {
+        // near fog
+        float zz = gl_Position.z / gl_Position.w;
+        // go from 1 to 0, and make the curve less straight
+        float fogScale = pow( 1. - zz, 0.7 );
+        // everything closer than 0.2 gets regular color
+        // but everything else stays the same, creating a discontinuity
+        if ( fogScale > 0.2 ) fogScale = 1.0;
+        // mutliply color by this value to make it go to black
+        vColor *= fogScale;
+    // } else if (fogType == 3 ){
+    // 	vColor.r *= mousePos.x/1000.;
+    // 	vColor.g *= mousePos.y/1000.;
+    // 	vColor.b *= abs(1. - (mousePos.x + mousePos.y)/1000.);
+    }
+
+}
+</script>
+
+<script type="x-shader/x-vertex" id="fragmentShader">
+// this gets called once per pixel
+varying vec3 vColor;
+void main()
+{
+	// just use the color we computed and assign it to this pixel
+    gl_FragColor = vec4( vColor, 1. );
+}
+</script>
+
+<script type="text/javascript" id="mainCode">
+var camera;
+var scene;
+var renderer;
+var mesh;
+
+var effect;
+var controls;
+var clicky = 1;
+var mouseX = 1;
+var mouseY = 1;
+
+
+var matArray = [];
+var currentHeadQuat = new THREE.Vector4(0,0,0,1);
+var lastHeadQuat = new THREE.Vector4(0,0,0,1);
+
+var offsetPerTileArray = [];
+
+for(var i=-3; i<=3; i++){
+    for(var j=-3; j<=3; j++){
+        offsetPerTileArray[offsetPerTileArray.length] = new THREE.Vector3(i,j,0.);
+    }
+}
+var numTiles = offsetPerTileArray.length;
+
+// var modelFileName = 'media/cubeBump.obj';
+var modelFileName = 'media/truncPyramidBump.obj';
+
+init();
+animate();
+
+function onkey(event) {
+    event.preventDefault();
+    if (event.keyCode == 90) { // z
+        controls.zeroSensor();
+    }
+};
+window.addEventListener("keydown", onkey, true);
+
+document.body.addEventListener('dblclick', function () {
+    effect.setFullScreen(true);
+});
+
+function loadStuff(){
+    // one material per monkey, since they have a different quaternion
+    for (var i = 0; i < numTiles; i++)
+    {
+        matArray[i] = materialBase.clone();
+    }
+
+    // load the monkey mesh
+    var manager = new THREE.LoadingManager();
+    var loader = new THREE.OBJLoader(manager);
+    loader.load(modelFileName, function (object) {
+    // loader.load('media/dodecDualRot90.obj', function (object) {
+
+        // make numTiles copies of the mesh and assign them a unique material out of the numTiles we created previously
+        for (var i = 0; i < numTiles; i++)
+        {
+            var newObject = object.clone();
+            newObject.traverse(function (child) {
+                if (child instanceof THREE.Mesh) {
+                    child.material = matArray[i];
+                    child.frustumCulled = false;
+                }
+            });
+            scene.add(newObject);
+        }
+    });
+
+    for (var i = 0; i < numTiles; i++)
+    {
+        matArray[i].uniforms['offsetPerTile'].value = offsetPerTileArray[i];
+        matArray[i].uniforms['time'].value = .00025 * (Date.now() - start);
+        matArray[i].uniforms['fogType'].value = clicky;
+        // matArray[i].uniforms['mousePos'].value = new THREE.Vector2(mouseX, mouseY);
+        // matArray[i].uniforms['travelDir'].value = travelDir;
+        // matArray[i].uniforms['colourDir'].value = colourDir;
+        // matArray[i].uniforms['HopfColorMatrix'].value = HopfColorMatrix;
+        // matArray[i].uniforms['modelScale'].value = modelScale;
+    }
+
+}
+
+function init()
+{
+    start = Date.now();
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.x = 0;
+    camera.position.z = +3;
+
+    // -----
+	// vr stuff
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    document.body.appendChild(renderer.domElement);
+
+    controls = new THREE.VRControls(camera);
+
+    effect = new THREE.VREffect(renderer);
+    effect.setSize(window.innerWidth, window.innerHeight);
+    // -----
+
+	// material for the monkeys is a shader
+    materialBase = new THREE.ShaderMaterial({
+		// these are the parameters for the shader
+        uniforms: {
+			// global time
+            time: {
+                type: "f",
+                value: 0.0
+            },
+			// quaternion that moves this monkey into 4-space, set once per monkey
+            offsetPerTile: {
+                type: "v3",
+                value: new THREE.Vector3( 0, 0, 0 )
+            },
+            fogType: {
+                type: "i",
+                value: 0
+            }
+        },
+        vertexShader: document.getElementById('vertexShader').textContent,
+        fragmentShader: document.getElementById('fragmentShader').textContent
+    });
+    materialBase.side = THREE.FrontSide;
+
+    loadStuff();
+
+    window.addEventListener('resize', onWindowResize, false);
+
+    effect.render(scene, camera);
+}
+
+function animate() {
+
+
+	// send the time every frame so that we can rotate the Tiles over time
+    for (var i = 0; i < numTiles; i++)
+    {
+        matArray[i].uniforms['offsetPerTile'].value = offsetPerTileArray[i];
+        matArray[i].uniforms['time'].value = .00025 * (Date.now() - start);
+        matArray[i].uniforms['fogType'].value = clicky;
+    }
+
+
+    controls.update();
+
+        effect.render(scene, camera);
+
+    requestAnimationFrame(animate);
+}
+
+document.addEventListener('keydown', function(event) { selectPolychora(event); }, false);
+
+// function selectThing(event) {
+
+//   var keySelect = event.keyCode - 48; //1 is 49
+
+//   if (keySelect > 0 && keySelect < 6){
+//      if (scene) {
+//        while (scene.children.length > 0) {
+//            scene.remove(scene.children[scene.children.length - 1]);
+//        }
+//     // polychoron = polychoraList[(keySelect-1)];
+//     offsetPerTileArray = quatPerMonkeyArrayDict[polychoron];
+//     numMonkeys = quatPerMonkeyArray.length;
+//     modelFileName = modelFileNameDict[polychoron];
+
+//     loadStuff();
+//     }
+//   }
+// }
+
+		//listen for mouse movement to get mouseX and mouseY
+
+		// document.body.addEventListener( 'mousemove', function (event) {
+		//  	mouseY = event.clientY;
+		//  	mouseX = event.clientX;
+		// });
+
+		//listen for click
+
+		document.body.addEventListener( 'click', function(){
+			clicky = (clicky + 1) % 2;
+		})
+		/*
+		Listen for double click event to enter full-screen VR mode
+		*/
+		document.body.addEventListener( 'dblclick', function() {
+			effect.setFullScreen( true );
+		});
+		/*
+		Listen for keyboard events
+		*/
+		function onkey(event) {
+	    event.preventDefault();
+
+	    if (event.keyCode == 90) { // z
+	    	controls.zeroSensor(); //zero rotation
+	    } else if (event.keyCode == 70 || event.keyCode == 13) { //f or enter
+	    	effect.setFullScreen(true) //fullscreen
+	  	}else if (event.keyCode === 73){ //i
+	  		infoSign.material.visible = !infoSign.material.visible;
+	  	}else if (event.keyCode == 80) {//p
+	  		var music = document.querySelector('#music');
+	  		if (music.paused){
+	  			music.play();
+	  		} else{
+	  			music.pause();
+	  		}
+	  	}
+
+
+	  };
+	  window.addEventListener("keydown", onkey, true);
+
+	  	  //hold down keys to do rotations and stuff
+		// function key(event, sign) {
+		//   var control = controls.manualControls[String.fromCharCode(event.keyCode).toLowerCase()];
+		//   if (!control)
+		//     return;
+		//   if (sign === 1 && control.active || sign === -1 && !control.active)
+		//     return;
+		//   control.active = (sign === 1);
+		//   controls.manualRotateRate[control.index] += sign * control.sign;
+		// }
+		document.addEventListener('keydown', function(event) { key(event, 1); }, false);
+		document.addEventListener('keyup', function(event) { key(event, -1); }, false);
+
+		/*
+		Handle window resizes
+		*/
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			effect.setSize( window.innerWidth, window.innerHeight );
+		}
+		window.addEventListener( 'resize', onWindowResize, false );
+	</script>
+</html>
