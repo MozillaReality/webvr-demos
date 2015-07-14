@@ -57,7 +57,7 @@
         })
         .then(function (data) {
           sites.innerHTML += data.sites.map(function (site) {
-            return '<li><a href="' + escape_(site.path ? ('/demos' + site.path) : site.url) + '">' + escape_(site.name) + '</a></li>';
+            return '<li><a href="' + escape_(site.path ? ('demos' + site.path) : site.url) + '">' + escape_(site.name) + '</a></li>';
           }).join('\n');
         }).catch(console.error.bind(console));
 
