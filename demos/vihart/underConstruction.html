@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>Under Construction</title>
+
+		<!--
+		Placeholder site for your great upcoming webVR experiences!!!
+		 -->
+
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+	<!--Music from Peter J https://musopen.org/music/349/erik-satie/gymnopedie-no-1-harp-arr/ -->
+	<audio id='music' src="media/satie.mp3" autoplay=true loop=true/>
+	<!--jumping sounds recorded by yours truly-->
+	<audio id='jump1' src="media/jump1.ogg">
+	<audio id='jump2' src="media/jump2.ogg">
+	<audio id='jump3' src="media/jump3.ogg">
+	<audio id='jump4' src="media/jump4.ogg">
+	<audio id='jump5' src="media/jump5.ogg">
+	<audio id='jump6' src="media/jump6.ogg">
+	<audio id='jump7' src="media/jump7.ogg">
+	</body>
+
+	<!--
+	three.js 3d library
+	-->
+	<script src="js/lib/three.min.js"></script>
+
+	<!--
+	library for fast quaternion rotation
+	-->
+	<script src="js/lib/gl-matrix.js"></script>
+
+	<!--
+	VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
+	 -->
+	<script src="js/vr/PhoneVR.js"></script>
+	<script src="js/vr/VRControls.js"></script>
+
+	<!--
+	VREffect.js handles stereo camera setup and rendering.
+	-->
+	<script src="js/vr/VREffect.js"></script>
+
+	<!--font from http://mrdoob.github.com/three.js/examples/fonts/helvetiker_regular.typeface.js -->
+	<script src="js/lib/helvetiker.js"></script>
+
+	<script>
+		/*
+		Setup three.js WebGL renderer
+		*/
+		var renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setClearColor( 0xffff00, 1 );
+		/*
+		Append the canvas element created by the renderer to document body element.
+		*/
+		document.body.appendChild( renderer.domElement );
+		/*
+		Create a three.js scene
+		*/
+		var scene = new THREE.Scene();
+		/*
+		Create a three.js camera
+		*/
+		var camera = new THREE.PerspectiveCamera( 110, window.innerWidth / window.innerHeight, 1, 10000 );
+		/*
+		Apply VR headset positional data to camera.
+		*/
+		var controls = new THREE.VRControls( camera );
+		/*
+		Apply VR stereo rendering to renderer
+		*/
+		var effect = new THREE.VREffect( renderer );
+		effect.setSize( window.innerWidth, window.innerHeight );
+
+		//jumping sound effects
+
+		var jumpSounds = [
+			document.querySelector('#jump1'),
+			document.querySelector('#jump2'),
+			document.querySelector('#jump3'),
+			document.querySelector('#jump4'),
+			document.querySelector('#jump5'),
+			document.querySelector('#jump6'),
+			document.querySelector('#jump7')
+			];
+		/*
+		define interaction variables
+		*/
+		var mouseY = 1;
+		var mouseX = 1;
+		var clicky = 0;
+
+		//create info overlay
+		var infoText = THREE.ImageUtils.loadTexture( "media/infographic.jpg" );
+		var infoMaterial = new THREE.MeshBasicMaterial( {map: infoText, color: 0xffffff});
+		var infoBox = new THREE.BoxGeometry(2,2,2);
+		var infoSign = new THREE.Mesh( infoBox, infoMaterial );
+		infoSign.position.z = -3;
+		infoSign.position.x = -3;
+		infoSign.position.y = -.5;
+		(infoSign);
+		scene.add( infoSign );
+
+		// create main particles: adapted from aerotwist.com's particle creation tutorial
+		var particleCount = 20;
+		var particles = new THREE.Geometry();
+		var pMaterial = new THREE.PointCloudMaterial({
+		      color: 0xFFFFFF,
+		      size: 50,
+			  map: THREE.ImageUtils.loadTexture(
+			    "media/construction2.png"), //adapted from http://www.textfiles.com/underconstruction/
+			  blending: THREE.SubtractiveBlending,
+			  transparent: true
+			    });
+
+		for (var p = 0; p < particleCount; p++) {
+		  var pX = Math.random() * 800 - 500,
+		      pY = Math.random() * 500,
+		      pZ = Math.random() * 800 - 500,
+		      particle = (
+		        new THREE.Vector3(pX, pY, pZ)
+		      );
+			particle.velocity = new THREE.Vector3(
+			  Math.random(),
+			  -Math.random()*2,
+			  Math.random());
+		  particles.vertices.push(particle);
+		}
+
+		var particleSystem = new THREE.PointCloud(
+		    particles,
+		    pMaterial);
+
+		particleSystem.sortParticles = true;
+
+		scene.add(particleSystem);
+
+		//create "thank you" text
+		var thanksText = ['Thank you', 'for your', 'patience!', ' ', ' ', 'Thank you', 'for your', 'patience!', ' '];
+
+		var message2 = [];
+		var messageGroup2 = [];
+
+		  for (var i = 0; i < thanksText.length; i++) {
+		    message2[i] = new THREE.Mesh(
+		    	new THREE.TextGeometry(thanksText[i]),
+		    	new THREE.MeshLambertMaterial());
+		 message2[i].position.x = -800;
+		 message2[i].position.z = -500;
+		 message2[i].position.y = 400;
+		 messageGroup2[i] = new THREE.Object3D();
+		 messageGroup2[i].add(message2[i]);
+		 messageGroup2[i].rotation.y = i*.7;
+		 scene.add(messageGroup2[i]);
+		  }
+
+		  //create under construction text
+		var message = [];
+		var messageGroup = [];
+
+		  for (var i = 0; i < 3; i++) {
+		    message[i] = new THREE.Mesh(
+		    	new THREE.TextGeometry("UNDER CONSTRUCTION"),
+		    	new THREE.MeshNormalMaterial());
+		 message[i].position.x = -800;
+		 message[i].position.z = -500;
+		 message[i].position.y = -400;
+		 messageGroup[i] = new THREE.Object3D();
+		 messageGroup[i].add(message[i]);
+		 messageGroup[i].rotation.y = i* 2.1;
+		 scene.add(messageGroup[i]);
+		  }
+
+		  var message3 = [];
+		 var message3Group = [];
+		 var comeBackSoon = ['Come', 'back', 'soon!']
+
+		 for (var i = 0; i < 3; i++) {
+		    message3[i] = new THREE.Mesh(
+		    	new THREE.TextGeometry(comeBackSoon[i]),
+		    	new THREE.MeshLambertMaterial());
+		 message3[i].position.x = -60;
+		 message3[i].position.z = -60;
+		 message3[i].position.y = 800;
+		 message3Group[i] = new THREE.Object3D();
+		 message3Group[i].add(message3[i]);
+		 message3Group[i].rotation.y = i* 4.2;
+		 scene.add(message3Group[i]);
+		  }
+
+		  var message4 = new THREE.Mesh(
+		  	new THREE.TextGeometry("HARD HAT AREA"),
+		  	new THREE.MeshBasicMaterial({color: 0xff0000}));
+		  message4.position.x = 1000;
+		  message4.position.z = 800;
+		  message4.position.y = 150;
+		  message4.rotation.y = 3.7;
+		  scene.add(message4);
+
+		//create sign border
+		var geometry = new THREE.BoxGeometry(250,250,100);
+		var material = new THREE.MeshLambertMaterial( {color: 0x221100, wireframe: false} );
+		var triangle = new THREE.Mesh( geometry, material );
+		triangle.position.z = -400;
+		triangle.rotation.x = 0;
+		triangle.rotation.y = 0;
+		scene.add( triangle );
+		//create sign
+		var geometry2 = new THREE.BoxGeometry(200,200,150);
+		var material2 = new THREE.MeshLambertMaterial( {color: 0x222200, wireframe: false} );
+		var triangle2 = new THREE.Mesh( geometry2, material2 );
+		triangle2.position.z = -390;
+		triangle2.rotation.x = 0;
+		triangle2.rotation.y = 0;
+		scene.add( triangle2 );
+
+		 //create exclamation point
+		var exclaim = new THREE.Mesh(
+			new THREE.BoxGeometry(1,8,1),
+			new THREE.MeshBasicMaterial({color: 0x000000, wireframe: false}));
+		exclaim.position.y = 1;
+
+		var exclaimDot = new THREE.Mesh(
+			new THREE.BoxGeometry(1,1,1),
+			new THREE.MeshBasicMaterial({color: 0x000000, wireframe: false}));
+		exclaimDot.position.y = -5;
+
+		var exclamation = new THREE.Object3D();
+		exclamation.position.z = -20;
+		exclamation.add(exclaim, exclaimDot);
+		scene.add(exclamation);
+
+		//create hammer
+		var hammerHandle = new THREE.Mesh(
+			new THREE.CylinderGeometry(25,25,280,6),
+			new THREE.MeshLambertMaterial({color: 0x331100}));
+		hammerHandle.position.z = 190;
+		hammerHandle.rotation.x = 1.55;
+
+		var hammerHead = new THREE.Mesh(
+			new THREE.CylinderGeometry(60,60,180,12),
+			new THREE.MeshLambertMaterial({color: 0x333333}));
+		hammerHead.position.z = 390;
+
+		var hammer = new THREE.Object3D();
+		hammer.position.x = -600;
+		hammer.position.y = -100;
+		hammer.add(hammerHead, hammerHandle);
+		scene.add(hammer);
+
+		//traffic cone
+
+		var coneTop = new THREE.Mesh(
+			new THREE.CylinderGeometry(.1,2,5,20),
+			new THREE.MeshLambertMaterial({color: 0x221100}));
+		coneTop.position.x = 3;
+		coneTop.position.z = -1;
+		coneTop.position.y = -4;
+		scene.add(coneTop);
+
+		var coneBottom = new THREE.Mesh(
+			new THREE.BoxGeometry(4,1,4),
+			new THREE.MeshLambertMaterial({color:0x221100}));
+		coneBottom.position.x = 3;
+		coneBottom.position.z = -1;
+		coneBottom.position.y = -6;
+		scene.add(coneBottom);
+
+		var coneTop2 = new THREE.Mesh(
+			new THREE.CylinderGeometry(.1,2,5,20),
+			new THREE.MeshLambertMaterial({color: 0x221100}));
+		coneTop2.position.x = -2;
+		coneTop2.position.z = -3;
+		coneTop2.position.y = -5;
+		scene.add(coneTop2);
+
+		var coneBottom2 = new THREE.Mesh(
+			new THREE.BoxGeometry(4,1,4),
+			new THREE.MeshLambertMaterial({color:0x221100}));
+		coneBottom2.position.x = -2;
+		coneBottom2.position.z = -3;
+		coneBottom2.position.y = -7;
+		coneBottom2.rotation.y = 2;
+		scene.add(coneBottom2);
+
+		var coneTop3 = new THREE.Mesh(
+			new THREE.CylinderGeometry(.1,2,5,20),
+			new THREE.MeshLambertMaterial({color: 0x221100}));
+		coneTop3.position.x = -3;
+		coneTop3.position.z = 3;
+		coneTop3.position.y = -6;
+		scene.add(coneTop3);
+
+		var coneBottom3 = new THREE.Mesh(
+			new THREE.BoxGeometry(4,1,4),
+			new THREE.MeshLambertMaterial({color:0x221100}));
+		coneBottom3.position.x = -3;
+		coneBottom3.position.z = 3;
+		coneBottom3.position.y = -8;
+		scene.add(coneBottom3);
+
+		var coneTop4 = new THREE.Mesh(
+			new THREE.CylinderGeometry(.1,2,5,20),
+			new THREE.MeshLambertMaterial({color: 0x221100}));
+		coneTop4.position.x = 3;
+		coneTop4.position.z = 6;
+		coneTop4.position.y = -6;
+		scene.add(coneTop4);
+
+		var coneBottom4 = new THREE.Mesh(
+			new THREE.BoxGeometry(4,1,4),
+			new THREE.MeshLambertMaterial({color:0x221100}));
+		coneBottom4.position.x = 3;
+		coneBottom4.position.z = 6;
+		coneBottom4.position.y = -8;
+		coneBottom4.rotation.y = 2;
+		scene.add(coneBottom4);
+
+		var cautionTape = new THREE.Mesh(
+			new THREE.CylinderGeometry(1000,1000,100,50,0,0),
+			new THREE.MeshBasicMaterial({
+				color:0xffffff,
+				map: THREE.ImageUtils.loadTexture("media/caution2.png"),
+				}));
+		cautionTape.material.side = THREE.BackSide;
+		scene.add(cautionTape);
+
+		var cautionTape2 = new THREE.Mesh(
+			new THREE.CylinderGeometry(1020,1020,100,50,0,0),
+			new THREE.MeshBasicMaterial({
+				color:0xffffff,
+				map: THREE.ImageUtils.loadTexture("media/caution2.png"),
+				}));
+		cautionTape2.material.side = THREE.BackSide;
+		cautionTape2.position.z = -30;
+		cautionTape2.position.x = -200;
+		cautionTape2.rotation.x = 1;
+		scene.add(cautionTape2);
+
+		var cautionTape3 = new THREE.Mesh(
+			new THREE.CylinderGeometry(1040,1040,100,50,0,0),
+			new THREE.MeshBasicMaterial({
+				color:0xffffff,
+				map: THREE.ImageUtils.loadTexture("media/caution2.png"),
+				}));
+		cautionTape3.material.side = THREE.BackSide;
+		cautionTape3.position.z = 300;
+		cautionTape3.position.x = 200;
+		cautionTape3.rotation.x = -.7;
+		scene.add(cautionTape3);
+
+		//create light
+		var light = new THREE.PointLight( 0xffffff, 10, 600);
+		light.position.set( -100,1,1);
+		light.castShadow = true;
+		scene.add( light );
+
+		var light2 = new THREE.PointLight( 0xffffff, 10, 1000);
+		light2.position.set( 0,400,1);
+		light2.castShadow = true;
+		scene.add( light2 );
+
+
+		// var light3 = new THREE.PointLight( 0xffffff, 60, 800);
+		// light3.position.set( 0,600,1);
+		// light3.castShadow = true;
+		// scene.add( light3 );
+
+		//sprite adapted from http://www.textfiles.com/underconstruction/
+		var map1 = THREE.ImageUtils.loadTexture( "media/shovel1.png" );
+		var map2 = THREE.ImageUtils.loadTexture( "media/shovel2.png" );
+		var map3 = THREE.ImageUtils.loadTexture( "media/shovel3.png" );
+		var map4 = THREE.ImageUtils.loadTexture( "media/shovel4.png" );
+
+		var spriteMap = [map1,map2,map3,map4];
+
+		var maSprite = new THREE.SpriteMaterial( {
+				map: spriteMap[0],
+				color: 0xffffff,
+				fog:true,
+				// blending: THREE.AdditiveBlending,
+				// transparent: false
+				});
+		var sprite = new THREE.Sprite( maSprite );
+		// sprite.position.x = 50;
+		sprite.position.z = -.1;
+		sprite.position.x = 2;
+		scene.add( sprite );
+
+		//time for blinking and animating
+		var t = 0;
+
+		/*
+		Request animation frame loop function
+		*/
+		function animate() {
+
+			t = (t + .05) % 4;
+
+			//info sign
+			infoSign.rotation.y += .01;
+			infoSign.position.y += .001;
+
+			//animate caution tape
+			cautionTape2.rotation.y += .01;
+			cautionTape.rotation.y += -.005;
+			cautionTape2.rotation.x += .01*clicky;
+			cautionTape3.rotation.y += -.015;
+			cautionTape3.rotation.x += mouseX*clicky*.00001;
+
+			//animate gif
+				sprite.material.map = spriteMap[Math.floor(t)];
+
+			//blink
+			if (t<2){
+				message4.material.visible = false;
+				triangle.material.color.setRGB(t/4,0,0);
+			} else {
+				message4.material.visible = true;
+				triangle.material.color.setRGB((1-(t - 2)/2),0,0);
+			}
+
+			//rotate stuff
+
+			triangle.position.y += Math.sin(exclamation.rotation.y)/8;
+
+
+			exclamation.rotation.y += .05;
+			exclamation.position.y += Math.sin(exclamation.rotation.y)/10;
+
+			hammer.rotation.x += - Math.sin(exclamation.rotation.y)/30;
+
+
+			for (var i = 0; i< message.length; i++){
+				messageGroup[i].rotation.y += .01;
+				message3[i].lookAt(camera.position);
+				message3Group[i].rotation.y += .03;
+				message3[i].material.color.setRGB(Math.random(),Math.random(),Math.random());
+			}
+
+			for (var i = 0; i< message2.length; i++){
+				messageGroup2[i].rotation.y += -.02;
+				message2[i].material.color.setRGB((t/8), 0, (1-t/4));
+			}
+
+
+			//animate particles; messy, sorry!
+
+			var pCount = particleCount;
+
+			particleSystem.rotation.y -= mouseX/50000 - .01;
+
+			while (pCount--) {
+
+			    // get the particle
+			    var particle =
+			      particles.vertices[pCount];
+
+			    // check if we need to reset
+			    if (particle.y < -310) {
+			      particle.y = 500;
+			      particle.x = 800*Math.random() - 500;
+			      particle.z = 800*Math.random() - 500;
+			      particle.velocity.y = -Math.random();
+			    } else if (particle.y > 510){
+			      particle.y = -300;
+			      particle.x = 800*Math.random() - 500;
+			      particle.z = 800*Math.random() - 500;
+			      particle.velocity.y = -Math.random();
+			    }
+
+				particle.velocity.y += (Math.random() * .01) -(mouseY/10000 - .03);
+
+			    particle.y += particle.velocity.y;
+			    particle.z += particle.velocity.z;
+			    particle.x += particle.velocity.x;
+
+		       	particle.velocity.x = Math.random();
+		       	particle.velocity.y = -Math.random()*(mouseY/100);
+		       	particle.velocity.z = Math.random();
+
+
+		 	 }
+
+			/*
+			Update VR headset position and apply to camera.
+			*/
+			controls.update();
+			/*
+			Render the scene through the VREffect.
+			*/
+			effect.render( scene, camera );
+			requestAnimationFrame( animate );
+		}
+		/*
+		Kick off animation loop
+		*/
+		animate();
+
+		//links
+
+		function link(){
+
+				window.location="http://vihart.github.io/webVR-playing-with/";
+
+		}
+
+		//listen for mouse movement to get mouseX and mouseY
+
+		document.body.addEventListener( 'mousemove', function (event) {
+		 	mouseY = event.clientY;
+		 	mouseX = event.clientX;
+		});
+
+		//listen for click
+
+		document.body.addEventListener( 'click', function(){
+			clicky = (clicky + 1) % 3;
+			if (clicky ===1){
+				renderer.setClearColor( 0xffcc00, 1 );
+			}else if(clicky === 2){
+				renderer.setClearColor( 0xccff00, 1 );
+			}else {
+				renderer.setClearColor( 0xffff00, 1 );
+			}
+		})
+		/*
+		Listen for click event to enter full-screen VR mode
+		*/
+		document.body.addEventListener( 'click', function() {
+			effect.setFullScreen( true );
+		});
+		/*
+		Listen for keyboard events
+		*/
+		function onkey(event) {
+	    event.preventDefault();
+
+	    if (event.keyCode == 90) { // z
+	    	controls.zeroSensor(); //zero rotation
+	    } else if (event.keyCode == 70 || event.keyCode == 13) { //f or enter
+	    	effect.setFullScreen(true) //fullscreen
+	    } else if (event.keyCode == 32) {//space
+	    	var j = Math.floor(Math.random()*7);
+	  		jumpSounds[j].play();
+	  	} else if (event.keyCode == 80) {//p
+	  		var music = document.querySelector('#music');
+	  		if (music.paused){
+	  			music.play();
+	  		} else{
+	  			music.pause();
+	  		}
+	  	} else if (event.keyCode === 73){ //i
+	  		infoSign.material.visible = !infoSign.material.visible;
+	  		infoSign.position.y = -.5;
+	  	}
+
+
+	  };
+	  window.addEventListener("keydown", onkey, true);
+
+	  	  //hold down keys to do rotations and stuff
+		function key(event, sign) {
+		  var control = controls.manualControls[String.fromCharCode(event.keyCode).toLowerCase()];
+		  if (!control)
+		    return;
+		  if (sign === 1 && control.active || sign === -1 && !control.active)
+		    return;
+		  control.active = (sign === 1);
+		  controls.manualRotateRate[control.index] += sign * control.sign;
+		}
+		document.addEventListener('keydown', function(event) { key(event, 1); }, false);
+		document.addEventListener('keyup', function(event) { key(event, -1); }, false);
+
+		/*
+		Handle window resizes
+		*/
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			effect.setSize( window.innerWidth, window.innerHeight );
+		}
+		window.addEventListener( 'resize', onWindowResize, false );
+	</script>
+</html>

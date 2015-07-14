@@ -1,0 +1,477 @@
+﻿<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>Mirrored Dodecahedron Hyperbolic Space</title>
+
+        <!--
+        Hyperbolic Space prototype with webVR support. WASD + Arrows to move.
+
+        Initial version developed at a hyperbolic webVR "hackalot" with Vi Hart, Mike Stay, Henry Segerman, Andrea Hawksley, and Andrew Lutomirski, with help from Marc ten Bosch's 4d graphics shader, Jeff Week's Curved Spaces, Mozilla's webVR framework for THREEjs.
+
+        http://vihart.com
+        http://www.segerman.org/
+        http://reperiendi.wordpress.com/
+        https://github.com/hawksley
+        http://www.geometrygames.org/CurvedSpaces/
+        http://www.marctenbosch.com
+        https://github.com/MozVR/vr-web-examples/tree/master/threejs-vr-boilerplate
+
+
+        -->
+
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+        <style>
+            body {
+                background-color: #000;
+                color: #fff;
+                margin: 0px;
+                padding: 0;
+                overflow: hidden;
+            }
+        </style>
+    </head>
+
+    <body>
+    <audio id='music' src="media/monkeygif.mp3"/>
+
+    </body>
+
+    <!--
+    three.js 3d library
+    -->
+    <script src="js/lib/three.min.js"></script>
+
+    <!--
+    library for fast quaternion rotation
+    -->
+    <script src="js/lib/gl-matrix.js"></script>
+
+    <!--
+    VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
+     -->
+     <script src="js/vr/PhoneVR.js"></script>
+    <script src="js/vr/VRControls.js"></script>
+
+    <!--
+    VREffect.js handles stereo camera setup and rendering.
+    -->
+    <script src="js/vr/VREffect.js"></script>
+
+    <script src="js/loaders/OBJLoader.js"></script>
+    <script src="js/dodec.js"></script>
+
+<script type="x-shader/x-vertex" id="vertexShader">
+// This shader moves vertices around
+
+// input
+uniform float time; // global time in seconds
+uniform mat4 translation; // dodecahedral
+uniform int fogType; // which type of fog to use
+uniform vec2 mousePos;
+uniform mat4 boost;
+
+// Hopf fibration coloring
+// returns a color based on the 4D normal
+vec3 HopfColor( in vec4 nBase )
+{
+    vec4 n = nBase;
+
+    // compute the color
+    float y = n.x;
+    float u = n.y;
+    float v = n.z;
+    float x = n.w;
+
+    float r = 2. * (u*x + v*y);
+    float g = 2. * (u*y - v*x);
+    float b = x*x + y*y - u*u - v*v;
+
+    return vec3(r*0.5 + 0.5,g*0.5 + 0.5,b*0.5 + 0.5);
+}
+
+// output
+varying vec3 vColor; // this shader computes the color of each vertex
+
+vec4 projectToHyperboloid(vec4 v) {
+    float scaleFactor = sqrt(v.w * v.w - v.x * v.x - v.y * v.y - v.z * v.z);
+
+    vec4 result;
+    result.x = v.x / scaleFactor;
+    result.y = v.y / scaleFactor;
+    result.z = v.z / scaleFactor;
+    result.w = v.w / scaleFactor;
+    return result;
+}
+
+// this gets called once per vertex of the monkey mesh (and 8 times since there are 8 monkeys)
+void main()
+{
+    // base position
+    // turn a 3D position of a monkey into a 4D position by adding a 1 as the w component then normalizing To get onto the unit 3-sphere
+    vec4 p = projectToHyperboloid( vec4(position.zyx / 1.3, 1.0) );
+    p = boost * translation * p;
+
+    // this is the normal to the point
+    // same concept as for the position, but we add a 0 as the w component
+    vec4 n3sphere = vec4( normal.zyx, 0.0);
+
+    // compute the color from the normal
+    vColor = HopfColor(n3sphere);
+
+    // take the final 3D position and project it onto the screen
+    gl_Position = projectionMatrix * modelViewMatrix * p; //vec4( pos3 + vec3(0.0,-0.6,-1.5), 1.0 );
+
+    // do fog
+    if ( fogType == 1 )
+    {
+        // ramp fog
+        // compute distance to camera from 0 to 1
+        float zz = gl_Position.z / gl_Position.w;
+        // go from 1 to 0 instead (0 is furthest and 1 is where the camera is )
+        // ( note that the computed distance is not linear )
+        float fogScale = 1. - zz;
+        // anything closer than 0.1 gets regular color
+        if ( fogScale > 0.1 )
+            fogScale = 1.0;
+        // everything else ramps from 0 to 1
+        else
+            fogScale = fogScale / 0.1;
+        // mutliply color by this value to make it go to black
+        vColor *= fogScale;
+    }
+    else if ( fogType == 2 )
+    {
+        // near fog
+        float zz = gl_Position.z / gl_Position.w;
+        // go from 1 to 0, and make the curve less straight
+        float fogScale = pow( 1. - zz, 0.7 );
+        // everything closer than 0.2 gets regular color
+        // but everything else stays the same, creating a discontinuity
+        if ( fogScale > 0.2 ) fogScale = 1.0;
+        // mutliply color by this value to make it go to black
+        vColor *= fogScale;
+    } else if (fogType == 3 ){
+        vColor.r *= mousePos.x/1000.;
+        vColor.g *= mousePos.y/1000.;
+        vColor.b *= abs(1. - (mousePos.x + mousePos.y)/1000.);
+    }
+
+}
+</script>
+
+<script type="x-shader/x-vertex" id="fragmentShader">
+// this gets called once per pixel
+varying vec3 vColor;
+void main()
+{
+    // just use the color we computed and assign it to this pixel
+    gl_FragColor = vec4( vColor, 1. );
+}
+</script>
+
+<script type="text/javascript" id="mainCode">
+var camera;
+var scene;
+var renderer;
+var mesh;
+var matArray = new Array(169);
+var effect;
+var controls;
+var clicky = 0;
+var mouseX = 1;
+var mouseY = 1;
+var currentBoost = new THREE.Matrix4().set(1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1);
+
+
+init();
+animate();
+
+function onkey(event) {
+    event.preventDefault();
+    if (event.keyCode == 90) { // z
+        controls.zeroSensor();
+    }
+};
+window.addEventListener("keydown", onkey, true);
+
+document.body.addEventListener('dblclick', function () {
+    effect.setFullScreen(true);
+});
+
+function init()
+{
+    start = Date.now();
+    scene = new THREE.Scene();
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.x = 0;
+    camera.position.z = 0;
+
+    // -----
+    // vr stuff
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    document.body.appendChild(renderer.domElement);
+
+    controls = new THREE.VRControls(camera);
+
+    effect = new THREE.VREffect(renderer);
+    effect.setSize(window.innerWidth, window.innerHeight);
+    // -----
+
+    // material for the monkeys is a shader
+    materialBase = new THREE.ShaderMaterial({
+        // these are the parameters for the shader
+        uniforms: {
+            // global time
+            time: {
+                type: "f",
+                value: 0.0
+            },
+            // quaternion that moves this monkey into 4-space, set once per monkey
+            translation: {
+                type: "m4",
+                value: new THREE.Matrix4().set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+            },
+            fogType: {
+                type: "i",
+                value: 0
+            },
+            mousePos: {
+                type: "v2",
+                value: new THREE.Vector2(0,0)
+            },
+            boost: {
+                type: "m4",
+                value: new THREE.Matrix4().set(0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0)
+            }
+        },
+        vertexShader: document.getElementById('vertexShader').textContent,
+        fragmentShader: document.getElementById('fragmentShader').textContent
+    });
+    materialBase.side = THREE.FrontSide;
+
+    // one material per monkey, since they have a different quaternion
+    for (var i = 0; i < 169; i++)
+    {
+        matArray[i] = materialBase.clone();
+    }
+
+    // load the monkey mesh
+    var manager = new THREE.LoadingManager();
+    var loader = new THREE.OBJLoader(manager);
+    loader.load('media/spiky_dodec.obj', function (object) {
+
+        // make 8 copies of the mesh and assign them a unique material out of the 8 we created previously
+        for (var i = 0; i < 169; i++)
+        {
+            var newObject = object.clone();
+
+            newObject.traverse(function (child) {
+                if (child instanceof THREE.Mesh) {
+                    child.material = matArray[i];
+                }
+            });
+
+            scene.add(newObject);
+        }
+    });
+
+    window.addEventListener('resize', onWindowResize, false);
+
+    effect.render(scene, camera);
+}
+
+function animate() {
+
+
+    // send the time every frame so that we can rotate the monkeys over time
+    for (var i = 0; i < 169; i++)
+    {
+        matArray[i].uniforms['translation'].value = new THREE.Matrix4().copy(dodec[(i/13)|0]).multiply(dodec[i%13]);
+        matArray[i].uniforms['time'].value = .00025 * (Date.now() - start);
+        matArray[i].uniforms['fogType'].value = clicky;
+        matArray[i].uniforms['mousePos'].value = new THREE.Vector2(mouseX, mouseY);
+        matArray[i].uniforms['boost'].value = currentBoost;
+    }
+
+
+    controls.update();
+
+    effect.render(scene, camera);
+
+    requestAnimationFrame(animate);
+}
+
+//links
+
+function link(){
+
+        window.location="http://vihart.github.io/webVR-playing-with/index.html";
+
+
+}
+
+//listen for mouse movement to get mouseX and mouseY
+
+document.body.addEventListener( 'mousemove', function (event) {
+    mouseY = event.clientY;
+    mouseX = event.clientX;
+});
+
+//listen for click
+
+document.body.addEventListener( 'click', function(){
+    clicky = (clicky + 1) % 4;
+})
+/*
+Listen for double click event to enter full-screen VR mode
+*/
+document.body.addEventListener( 'dblclick', function() {
+    effect.setFullScreen( true );
+});
+
+/*
+Listen for keyboard events
+*/
+function onkey(event) {
+    event.preventDefault();
+
+    if (event.keyCode == 90) { // z
+        controls.zeroSensor(); //zero rotation
+    } else if (event.keyCode == 70 || event.keyCode == 13) { //f or enter
+        effect.setFullScreen(true) //fullscreen
+    } else if (event.keyCode == 32) {//space
+        link();
+    } else if (event.keyCode === 73){ //i
+        infoSign.material.visible = !infoSign.material.visible;
+    } else if (event.keyCode == 80) {//p
+        var music = document.querySelector('#music');
+        if (music.paused){
+            music.play();
+        } else{
+            music.pause();
+        }
+    }
+};
+window.addEventListener("keydown", onkey, true);
+var step = 0.05;
+
+var ud = new THREE.Matrix4().set(1,0,0,0,
+                        0,1,0,0,
+                        0,0,Math.cosh(step),Math.sinh(step),
+                        0,0,Math.sinh(step),Math.cosh(step));
+var lr = new THREE.Matrix4().set(1,0,0,0,
+                        0,Math.cosh(step),0,Math.sinh(step),
+                        0,0,1,0,
+                        0,Math.sinh(step),0,Math.cosh(step))
+var fb = new THREE.Matrix4().set(Math.cosh(step),0,0,Math.sinh(step),
+                        0,1,0,0,
+                        0,0,1,0,
+                        Math.sinh(step),0,0,Math.cosh(step));
+var udi = new THREE.Matrix4().getInverse(ud);
+var lri = new THREE.Matrix4().getInverse(lr);
+var fbi = new THREE.Matrix4().getInverse(fb);
+
+var infinitesimalBoosts = {
+    3: ud,
+    4: udi,
+    5: lr,
+    6: lri,
+    7: fb,
+    8: fbi
+};
+
+THREE.Matrix4.prototype.add = function (m) {
+    this.set.apply(this, [].map.call(this.elements, function (c, i) { return c + m.elements[i] }));
+};
+
+function translateByVector(v) {
+    var dx = v.x;
+    var dy = v.y;
+    var dz = v.z;
+    var len = Math.sqrt(dx*dx + dy*dy + dz*dz);
+    dx /= len;
+    dy /= len;
+    dz /= len;
+    var m = new THREE.Matrix4().set(
+         0, 0, 0, dx,
+         0, 0, 0, dy,
+         0, 0, 0, dz,
+        dx,dy,dz, 0);
+    var m2 = new THREE.Matrix4().copy(m).multiply(m);
+    var c1 = Math.sinh(len);
+    var c2 = Math.cosh(len) - 1;
+    m.multiplyScalar(c1);
+    m2.multiplyScalar(c2);
+    var result = new THREE.Matrix4().identity();
+    result.add(m);
+    result.add(m2);
+    return result;
+}
+
+function getFwdVector() {
+    return new THREE.Vector3(0,0,1).applyQuaternion(camera.quaternion);
+}
+function getRightVector() {
+    return new THREE.Vector3(-1,0,0).applyQuaternion(camera.quaternion);
+}
+function getUpVector() {
+    return new THREE.Vector3(0,-1,0).applyQuaternion(camera.quaternion);
+}
+
+//hold down keys to do rotations and stuff
+function key(event, sign) {
+    var letter = String.fromCharCode(event.keyCode).toLowerCase();
+    var control = controls.manualControls[letter];
+    if (!control) {
+        if (infinitesimalBoosts[letter]) {
+            var m = new THREE.Matrix4().copy(infinitesimalBoosts[letter]);
+            m.multiply(currentBoost);
+            currentBoost.copy(m);
+        } else if (event.keyCode === 38) {
+            var offset = getFwdVector();
+            offset.multiplyScalar(step);
+            var m = translateByVector(offset);
+            m.multiply(currentBoost);
+            currentBoost.copy(m);
+        } else if (event.keyCode === 40) {
+            var offset = getFwdVector();
+            offset.multiplyScalar(-step);
+            var m = translateByVector(offset);
+            m.multiply(currentBoost);
+            currentBoost.copy(m);
+        } else if (event.keyCode === 37) {
+            var offset = getRightVector();
+            offset.multiplyScalar(-step);
+            var m = translateByVector(offset);
+            m.multiply(currentBoost);
+            currentBoost.copy(m);
+        } else if (event.keyCode === 39) {
+            var offset = getRightVector();
+            offset.multiplyScalar(step);
+            var m = translateByVector(offset);
+            m.multiply(currentBoost);
+            currentBoost.copy(m);
+        }
+        return;
+    }
+    if (sign === 1 && control.active || sign === -1 && !control.active)
+        return;
+    control.active = (sign === 1);
+    controls.manualRotateRate[control.index] += sign * control.sign;
+}
+document.addEventListener('keydown', function(event) { key(event, 1); }, false);
+document.addEventListener('keyup', function(event) { key(event, -1); }, false);
+
+/*
+Handle window resizes
+*/
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    effect.setSize( window.innerWidth, window.innerHeight );
+}
+window.addEventListener( 'resize', onWindowResize, false );
+</script>
+</html>

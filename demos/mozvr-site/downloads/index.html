@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title> Downloads -MozVR
+    </title>
+    <link rel="alternate" href="/demos/mozvr-site/feed.xml" type="application/rss+xml" title="A virtual reality website about virtual reality websites">
+    <!-- link(rel='stylesheet', href='http://code.cdn.mozilla.net/fonts/fira.css')-->
+    <!-- link(href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css')-->
+    <!-- link(href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800italic,800' rel='stylesheet' type='text/css')-->
+    <link rel="stylesheet" href="/demos/mozvr-site/css/fonts/fonts.css">
+    <link rel="stylesheet" href="/demos/mozvr-site/css/global.css">
+  </head>
+  <body>
+    <!-- Splash + Title-->
+    <div style="background-image: url(locals.url + '/downloads/splash-1.jpg'); background-size: cover; background-position: 50% 50%" class="height32 py0 white bg-darkblue2 relative">
+      <div class="py2 white bg-darken5">
+        <div class="container">
+          <div class="table">
+            <div class="table-cell"><a href="/"><img src="/demos/mozvr-site/images/logo-mozvr-fira-white.svg" alt="Mozilla" class="mxn1 mt1 w10"></a></div>
+            <div class="table-cell full-width px3 nowrap"><a href="/downloads" class="px2 light rounded1 button hover-light uppercase header-link h5">Downloads</a><a href="/projects" class="px2 light rounded1 button hover-light uppercase header-link h5">Projects</a><a href="/posts" class="px2 light rounded1 button hover-light uppercase header-link h5">Blog</a></div>
+            <div class="table-cell right-align nowrap mxn2 pl2"><a href="https://github.com/MozVR/" target="_blank" class="rounded4 button hover-light px2"><img src="/demos/mozvr-site/images/icon-github-white.svg" alt="Twitter" class="w2"></a><a href="https://twitter.com/hashtag/mozvr" target="_blank" class="rounded4 button hover-light px2"><img src="/demos/mozvr-site/images/icon-twitter-white.svg" alt="Twitter" class="w2"></a>
+              <!--a(href='https://wiki.mozilla.org/IRC' target='_blank').rounded1.button.hover-light IRC-->
+              <!--a(href='https://mail.mozilla.org/listinfo/web-vr-discuss' target='_blank').rounded1.button.hover-light Mailing List-->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mb1 py2 bg-white">
+      <div class="container">
+        <!-- Intro-->
+        <div class="clearfix">
+          <div class="col col-10 m-col-6">
+            <h1>Getting started</h1>
+            <p>In order to experience WebVR, you'll need the following:</p>
+          </div>
+        </div>
+        <!-- Download links-->
+        <div class="clearfix mxn2">
+          <div class="col col-12 m-col-6 px2"><a href="http://nightly.mozilla.org/" class="mt2 p3 sizing-borderbox rounded2 block bg-green2 hover-blue1 decoration-none">
+              <div class="table">
+                <div class="table-cell mr1"><img src="/demos/mozvr-site/images/icon-download-1-white.svg" alt="Mozilla" class="w2 mr2"></div>
+                <div class="table-cell full-width">
+                  <h3 class="m0 white">1. Firefox Nightly&nbsp;</h3>
+                  <h5 class="m0 lighten5">Install Latest version</h5>
+                </div>
+              </div></a></div>
+          <div class="col col-12 m-col-6 px2"><a href="http://www.mozvr.com/downloads/webvr-addon-0.1.0.xpi" class="mt2 p3 sizing-borderbox rounded2 block bg-green2 hover-blue1 decoration-none">
+              <div class="table">
+                <div class="table-cell mr1"><img src="/demos/mozvr-site/images/icon-download-1-white.svg" alt="Mozilla" class="w2 mr2"></div>
+                <div class="table-cell full-width">
+                  <h3 class="m0 white">2. WebVR Enabler Add-On&nbsp;</h3>
+                  <h5 class="m0 lighten5">Install Version&nbsp;0.1.0
+                  </h5>
+                </div>
+              </div></a></div>
+          <div class="col col-12 m-col-8 px2 mt3">
+            <p><strong>Firefox Nightly</strong> includes core WebVR functionality, but it is disabled by default. The WebVR Add-On enables WebVR and disables multiprocess browsing (<a href="https://wiki.mozilla.org/Electrolysis" class="basiclink-blue">E10S</a>), a new feature which is currently incompatible with WebVR. Once you have installed Firefox Nightly, open it, install the Add-On, and then follow the prompt to restart the browser. Once you've configured your displays (see below) you will be ready to start experiencing the VR web!</p>
+            <p>For mobile users, <strong>Firefox for Android</strong> now also supports WebVR in<a href="http://nightly.mozilla.org/">Nightly builds</a>. The current implementation is rough and will evolve over time, so feedback is welcome!</p>
+            <p class="gray5">Note: The previous version of the Add-On ("WebVR Oculus Enabler") is now obsolete. It will not interfere with the new add-on, but it can optionally be uninstalled from Tools &#62; Add-ons &#62; Extensions.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="py2">
+      <div class="container">
+        <div class="clearfix">
+          <div class="col col-12 b-dotted b-gray3 bt1"></div>
+        </div>
+        <div class="clearfix">
+          <div class="col col-12 m-col-8">
+            <h2>3. Configure displays</h2>
+            <p>For optimal performance, it is <strong>very important</strong> to configure your displays as follows. Not doing so contributes to excess judder and latency. We are working on improving all of these aspects and making WebVR truly plug-and-play, but for now, best results require the following manual configuration.</p>
+          </div>
+        </div>
+        <!--Windows-->
+        <div class="clearfix">
+          <div class="col col-12">
+            <h3>Windows:</h3>
+          </div>
+        </div>
+        <div class="clearfix">
+          <div class="col col-12 p3 bg-gray1 rounded1"><img src="/demos/mozvr-site/downloads/win-display-3.png" class="fit">
+            <ul class="light m0 list-reset mt2">
+              <li class="semi-bold">Display<span class="gray5 light px1">&gt;</span>Screen Resolution</li>
+              <li>Orientation: Landscape (flipped)</li>
+              <li>Multiple displays:  Extend these displays</li>
+            </ul>
+            <div class="b-dotted b-gray3 bt1 my3"></div><img src="/demos/mozvr-site/downloads/win-display-2.png" class="fit">
+            <ul class="light mt2 list-reset mt2">
+              <li class="semi-bold">Advanced Settings<span class="gray5 light px1">&gt;</span>Monitor<span class="gray5 light px1">&gt;</span>Monitor Settings</li>
+              <li>Screen refresh rate: 60Hz</li>
+            </ul>
+          </div>
+        </div>
+        <!--Mac-->
+        <div class="clearfix mt3">
+          <div class="col col-12">
+            <h3>Mac:</h3>
+          </div>
+        </div>
+        <div class="clearfix mb4">
+          <div class="col col-12 p3 bg-gray1 rounded1"><img src="/demos/mozvr-site/downloads/mac-display-1.png" class="fit">
+            <ul class="light m0 list-reset mt2">
+              <li class="medium">System Preferences<span class="gray5 light px1">&gt;</span>Displays<span class="gray5 light px1">&gt;</span>Display</li>
+              <li>Optimize for: Rift</li>
+              <li>Rotation: 90°</li>
+              <li>Refresh: 60Hz</li>
+            </ul>
+            <div class="b-dotted b-gray3 bt1 my3"></div><img src="/demos/mozvr-site/downloads/mac-display-2.png" class="fit">
+            <ul class="light mt2 list-reset mt2">
+              <li class="medium">System Preferences<span class="gray5 light px1">&gt;</span>Displays<span class="gray5 light px1">&gt;</span>Arrangement</li>
+              <li>Arrangement: Mirrored</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer-->
+    <div class="py3 bg-blue3 light">
+      <div class="container">
+        <div class="clearfix">
+          <div class="col col-12 m-col-8"><a href="https://www.mozilla.org/en-US/" target="_blank"><img src="/demos/mozvr-site/images/logo-mozilla-white.svg" alt="Mozilla" class="w6 mt3 mb2"></a>
+            <p class="h5"><a href="https://www.mozilla.org/en-US/privacy/websites/" target="_blank" class="pr2 blue0">Privacy Policy</a><a href="https://www.mozilla.org/en-US/about/legal/" target="_blank" class="pr2 blue0">Legal Notices</a><a href="https://www.mozilla.org/en-US/about/legal/fraud-report/" target="_blank" class="pr2 blue0">Report Trademark Abuse</a></p>
+            <p class="h6 blue1">Except where otherwise noted, content on this site is licensed under the <a href="http://creativecommons.org/licenses/by-sa/2.5/" target="_blank" class="blue1">Creative Commons Attribution Share-Alike License v3.0</a> or any later version. Site built with <a href="http://wintersmith.io/" target="_blank" class="blue1">Wintersmith</a>.</p>
+          </div>
+          <div class="col m-col-4"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-24056643-3', 'auto');
+    ga('send', 'pageview');
+  </script>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>WebVR Lands in Firefox Nightly - MozVR
+    </title>
+    <link rel="alternate" href="/demos/mozvr-site/feed.xml" type="application/rss+xml" title="A virtual reality website about virtual reality websites">
+    <!-- link(rel='stylesheet', href='http://code.cdn.mozilla.net/fonts/fira.css')-->
+    <!-- link(href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css')-->
+    <!-- link(href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800italic,800' rel='stylesheet' type='text/css')-->
+    <link rel="stylesheet" href="/demos/mozvr-site/css/fonts/fonts.css">
+    <link rel="stylesheet" href="/demos/mozvr-site/css/global.css">
+  </head>
+  <body class="post-detail">
+    <!-- Splash + Title-->
+    <div style="background-image: url('post-splash.jpg'); background-size: cover; background-position: 50% 50%" class="height40 py0 white bg-darkblue2 relative">
+      <div class="py2 white bg-darken5">
+        <div class="container">
+          <div class="table">
+            <div class="table-cell"><a href="/"><img src="/demos/mozvr-site/images/logo-mozvr-fira-white.svg" alt="Mozilla" class="mxn1 mt1 w10"></a></div>
+            <div class="table-cell full-width px3 nowrap"><a href="/downloads" class="px2 light rounded1 button hover-light uppercase header-link h5">Downloads</a><a href="/projects" class="px2 light rounded1 button hover-light uppercase header-link h5">Projects</a><a href="/posts" class="px2 light rounded1 button hover-light uppercase header-link h5">Blog</a></div>
+            <div class="table-cell right-align nowrap mxn2 pl2"><a href="https://github.com/MozVR/" target="_blank" class="rounded4 button hover-light px2"><img src="/demos/mozvr-site/images/icon-github-white.svg" alt="Twitter" class="w2"></a><a href="https://twitter.com/hashtag/mozvr" target="_blank" class="rounded4 button hover-light px2"><img src="/demos/mozvr-site/images/icon-twitter-white.svg" alt="Twitter" class="w2"></a>
+              <!--a(href='https://wiki.mozilla.org/IRC' target='_blank').rounded1.button.hover-light IRC-->
+              <!--a(href='https://mail.mozilla.org/listinfo/web-vr-discuss' target='_blank').rounded1.button.hover-light Mailing List-->
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="absolute bottom-2 full-width">
+        <div class="container">
+          <div class="clearfix">
+            <div class="col col-12 m-col-8">
+              <h1 class="post-title italic ultralight uppercase mxn3 f-huge"><span class="p2 bg-yellow black">WebVR Lands in Firefox Nightly</span></h1>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="py3 gray8 bg-white">
+      <div class="container">
+        <!--Author-->
+        <div class="table mt3">
+          <div class="table-cell col-1 pr1"><a href="http://twitter.com/@vvuk" target="_blank" class="hover-lighten"><img src="/demos/mozvr-site/people/vlad-1.jpg" class="circle fit w4"></a></div>
+          <div class="table-cell col-11 gray5 light"> By<a href="http://twitter.com/@vvuk" target="_blank" class="basiclink-blue regular">Vlad Vukicevic</a> •<span class="italic">Thursday Jan 15, 2015</span></div>
+        </div>
+        <!--Body-->
+        <div class="clearfix">
+          <div class="post col col-12 m-col-8">
+            <!--p.regular.h2.py3.black.m0
+            = page.metadata.intro
+            
+            -->
+            <!--.bt1.b-dotted.b-gray3.mb3--><p class="intro h2">We’ve been working on adding <span class="caps">VR</span> capabilities to the Web for some months now, with the goal of making VR a first class citizen on the Web.  Today, we’re taking another step towards this by adding core VR support directly to our Firefox Nightly&nbsp;builds.</p>
+
+<p>Previously, users and content creators had to download a separate build of Firefox.  This one-off build usually lagged behind ongoing development. From now on, <span class="caps">VR</span> capabilities will be developed alongside other continuous Firefox improvements.  While Firefox Nightly builds include core WebVR functionality, an additional add-on is needed to integrate with the Oculus Rift&nbsp;headset.</p>
+<div class="post-summary">
+  <h4>
+    To experience WebVR content with an Oculus Rift<br/> with
+    Firefox Nightly builds, you’ll need&nbsp;to:
+  </h4>
+
+  <ol>
+    <li>Install most recent <a href="http://nightly.mozilla.org/">Firefox&nbsp;Nightly</a></li>
+    <li>Install <a href="/downloads/webvr-oculus-addon-0.4.4.xpi">WebVR Oculus Rift Enabler</a>&nbsp;add-on</li>
+    <li>Open a non-e10s browser&nbsp;window.</li>
+  </ol>
+</div>
+
+<p>The add-on simply provides the Oculus Rift <span class="caps">SDK</span> library so that Firefox can access it. In the future, this functionality may be bundled directly with Firefox, or provided by Oculus Runtime itself.  The source for the add-on, as well as build instructions, <a href="https://github.com/MozVR/webvr-oculus-addon">can be found on GitHub</a>.</p>
+<p>While <span class="caps">VR</span> support will be enabled in our Nightly and Developer Edition (Alpha) builds, it will currently be automatically disabled in Beta and Release builds. We’re still making rapid improvements and changes to both the VR interfaces and the necessary platform support pieces.  Once WebVR is more complete, we’ll discuss shipping plans to our Beta and Release&nbsp;builds.</p>
+<p>Because there is ongoing development on Firefox in many directions, there is one issue to be aware of. Currently, WebVR in Firefox does not work with multiprocess browsing (e10s), which is being tested simultaneously on our Nightly builds.  In order to view WebVR content, a non-e10s window must be&nbsp;used.</p>
+<figure>
+  <img src="/downloads/e10s.png" alt="File &gt; New Non-e10s Window">
+  <img src="/downloads/e10s-windows.png" alt="New Non-e10s Window">
+  <figcaption>
+    Creating non-e10s browser windows.
+  </figcaption>
+</figure>
+
+<p>You can create a new non-e10s window by going to the File menu and selecting “New Non-e10s Window”. (If instead that menu option says “New e10s Window”, then multiprocess browsing is disabled by default for you and you’re good to go.) It’s also possible to disable e10s entirely via the General tab in Preferences. We’re working on resolving this issue in the near&nbsp;future.</p>
+<p>Now that we’re able to work directly in our Nightly builds, we hope to have Direct-to-Rift support soon, as well as support for Linux, Firefox for Android, and the Cardboard device for mobile <span class="caps">VR</span> experiences.  We’ll also be starting to revisit VR support using CSS and the DOM, to maximize compatibility with existing Web content and Web development knowledge.  You’ll also soon be able to report bugs to us via bugzilla.mozilla.org in a new WebVR component.  And as always, please join the discussion on the <a href="https://mail.mozilla.org/listinfo/web-vr-discuss">web-vr-discuss mailing list</a>!</p>
+<p>Finally, today we are launching a new and improved version of mozvr.com with more resources for web developers and faster access to demos. Our first tutorial is from Josh Carpenter, on how to create <a href="/posts/quick-vr-prototypes/">Quick <span class="caps">VR</span> Mockups with Illustrator</a>. We’ll have more to come soon, with the goal of helping make it easier for everyone to create new <span class="caps">VR</span> web&nbsp;experiences.</p>
+
+          </div>
+          <div class="col m-col-2"></div>
+        </div>
+        <!--Author-->
+        <div class="b-solid b-blue0 bt4 mt4 mb0"></div>
+        <div class="clearfix mb3">
+          <h5 class="gray5 mb3">About the author</h5>
+                    <div class="col col-2"><a href="http://www.twitter.com/vvuk" target="_blank"><img src="/demos/mozvr-site/people/vlad-1.jpg" class="fit rounded1 outline-white"></a></div>
+                    <div class="col col-10 m-col-6 px2">
+                      <h3 class="m0">Vlad Vukicevic
+                      </h3>
+                      <p>Engineering Director,Mozilla<br><a href="http://www.twitter.com/vvuk" class="basiclink-blue">@vvuk</a>
+                        <p class="semibold"></p>Vlad works on graphics and media components of the Web platform, including VR and WebGL.  He's also heavily involved in Mozilla's Games efforts, and has helped bring high quality gaming to the Web.
+                      </p>
+                    </div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer-->
+    <div class="py3 bg-blue3 light">
+      <div class="container">
+        <div class="clearfix">
+          <div class="col col-12 m-col-8"><a href="https://www.mozilla.org/en-US/" target="_blank"><img src="/demos/mozvr-site/images/logo-mozilla-white.svg" alt="Mozilla" class="w6 mt3 mb2"></a>
+            <p class="h5"><a href="https://www.mozilla.org/en-US/privacy/websites/" target="_blank" class="pr2 blue0">Privacy Policy</a><a href="https://www.mozilla.org/en-US/about/legal/" target="_blank" class="pr2 blue0">Legal Notices</a><a href="https://www.mozilla.org/en-US/about/legal/fraud-report/" target="_blank" class="pr2 blue0">Report Trademark Abuse</a></p>
+            <p class="h6 blue1">Except where otherwise noted, content on this site is licensed under the <a href="http://creativecommons.org/licenses/by-sa/2.5/" target="_blank" class="blue1">Creative Commons Attribution Share-Alike License v3.0</a> or any later version. Site built with <a href="http://wintersmith.io/" target="_blank" class="blue1">Wintersmith</a>.</p>
+          </div>
+          <div class="col m-col-4"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-24056643-3', 'auto');
+    ga('send', 'pageview');
+  </script>
+</html>

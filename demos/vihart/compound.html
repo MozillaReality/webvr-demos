@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>Compound</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+
+	</body>
+
+	<!--
+	three.js 3d library
+	-->
+	<script src="js/lib/three.min.js"></script>
+		<!--rotating quaternions library-->
+	<script src="js/lib/gl-matrix.js"></script>
+
+	<!--
+	VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
+	 -->
+	<script src="js/vr/PhoneVR.js"></script>
+	<script src="js/vr/VRControls.js"></script>
+
+	<!--
+	VREffect.js handles stereo camera setup and rendering.
+	-->
+	<script src="js/vr/VREffect.js"></script>
+
+	<script>
+		/*
+		Setup three.js WebGL renderer
+		*/
+		var renderer = new THREE.WebGLRenderer( { antialias: true } );
+		/*
+		Append the canvas element created by the renderer to document body element.
+		*/
+		document.body.appendChild( renderer.domElement );
+		/*
+		Create a three.js scene
+		*/
+		var scene = new THREE.Scene();
+		/*
+		Create a three.js camera
+		*/
+		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+		/*
+		Apply VR headset positional data to camera.
+		*/
+		var controls = new THREE.VRControls( camera );
+		/*
+		Apply VR stereo rendering to renderer
+		*/
+		var effect = new THREE.VREffect( renderer );
+		effect.setSize( window.innerWidth, window.innerHeight );
+
+		/*
+		define interaction variables
+		*/
+
+		var mouseY = 1;
+		var mouseX = 1;
+		var clicky = 0;
+
+		//dodecahedral angles:
+
+		var t = ((1 + Math.sqrt(5))/2);
+		var fturn = 6.283/5;
+		/*
+		Create 3d objects
+		*/
+
+
+		var geometry = new THREE.DodecahedronGeometry(10);
+		var material = new THREE.MeshNormalMaterial( {wireframe: true} );
+		var dodec = new THREE.Mesh( geometry, material );
+		var tetgeom = new THREE.TetrahedronGeometry(10);
+
+		var tetsolid = new THREE.MeshNormalMaterial();
+		var tetred = new THREE.MeshBasicMaterial( {color: 0x880044, wireframeLinewidth: 10} );
+		var tetblue = new THREE.MeshBasicMaterial( {color: 0xff3300,  wireframeLinewidth: 10} );
+		var tetgreen = new THREE.MeshBasicMaterial( {color: 0xff5077, wireframeLinewidth: 10} );
+		var tetyellow = new THREE.MeshBasicMaterial( {color: 0x332222, wireframeLinewidth: 10} );
+		var tetcyan = new THREE.MeshBasicMaterial( {color: 0x004444,  wireframeLinewidth: 10} );
+
+		var tetmaterial = tetsolid;
+		// var tetgeom = new THREE.Geometry();
+		// tetgeom.vertices.push(
+		// 	new THREE.Vector3(-10, 10, 0),
+		// 	new THREE.Vector3(1, 2, 4),
+		// 	new THREE.Vector3(4, 3, 9)
+		// 	);
+
+		// tetgeom.faces.push(new THREE.Face3(0,1,2));
+		// tetgeom.computeBoundingSphere();
+
+		var tet = new THREE.Mesh( tetgeom, tetmaterial );
+		var tet2 = new THREE.Mesh( tetgeom, tetmaterial );
+		var tet3 = new THREE.Mesh( tetgeom, tetmaterial );
+		var tet4 = new THREE.Mesh( tetgeom, tetmaterial );
+		var tet5 = new THREE.Mesh( tetgeom, tetmaterial );
+		/*
+		Position cube mesh
+		*/
+		dodec.position.z = -20;
+		tet.position.z = -20;
+		tet2.position.z = -20;
+		tet3.position.z = -20;
+		tet4.position.z = -20;
+		tet5.position.z = -20;
+
+		var axis = new THREE.Vector3( t, 1, 0 );
+		axis.normalize();
+
+		// var tetr1 = 0;
+		// var tetq = new THREE.Quaternion();
+		// tetq.setFromAxisAngle(axis, fturn);
+
+		// tet2.quaternion = (tetq);
+
+		// tet2.updateMatrix();
+		/*
+		Add cube mesh to your three.js scene
+		*/
+		// scene.add( dodec );
+		scene.add( tet );
+		scene.add( tet2 );
+		scene.add( tet3 );
+		scene.add( tet4 );
+		scene.add( tet5 );
+
+
+		/*
+		Request animation frame loop function
+		*/
+		function animate() {
+			/*
+			Apply rotation to mesh
+			// */
+			// dodec.rotation.y += 0.01;
+			tetr1 = 0.01;
+			fturn = 1.25*((mouseY-500)/50000);
+
+
+			scalefactor = ((mouseX-800)/100);
+
+			tet.scale.set(scalefactor,scalefactor,scalefactor);
+			tet2.scale.set(scalefactor,scalefactor,scalefactor);
+			tet3.scale.set(scalefactor,scalefactor,scalefactor);
+			tet4.scale.set(scalefactor,scalefactor,scalefactor);
+			tet5.scale.set(scalefactor,scalefactor,scalefactor);
+
+			tet.rotateOnAxis (axis, tetr1);
+			tet2.rotateOnAxis (axis, fturn + tetr1);
+			tet3.rotateOnAxis (axis, 2*fturn + tetr1);
+			tet4.rotateOnAxis (axis, 3*fturn + tetr1);
+			tet5.rotateOnAxis (axis, 4*fturn + tetr1);
+
+			// tet.rotation.z += t/100;
+			// tet2.rotation.z += t/100;
+			// tet3.rotation.z += t/100;
+			// tet4.rotation.z += t/100;
+			// tet5.rotation.z += t/100;
+
+
+			// color change on click:
+
+			// if(clicky=0){
+
+			if(clicky==1){
+				tet.material = tetred;
+				tet2.material = tetgreen;
+				tet3.material = tetblue;
+				tet4.material = tetyellow;
+				tet5.material = tetcyan;
+			}else if(clicky==2){
+					tet.material.wireframe = true;
+					tet.material.wireframeLinewidth = mouseX/200;
+					tet2.material.wireframe = true;
+					tet2.material.wireframeLinewidth = mouseX/200;
+					tet3.material.wireframe = true;
+					tet3.material.wireframeLinewidth = mouseX/200;
+					tet4.material.wireframe = true;
+					tet4.material.wireframeLinewidth = mouseX/200;
+					tet5.material.wireframe = true;
+					tet5.material.wireframeLinewidth = mouseX/200;
+			}	else{
+				tet.material.wireframe = false;
+				tet.material = tetsolid;
+				tet2.material.wireframe = false;
+				tet2.material = tetsolid;
+				tet3.material.wireframe = false;
+				tet3.material = tetsolid;
+				tet4.material.wireframe = false;
+				tet4.material = tetsolid;
+				tet5.material.wireframe = false;
+				tet5.material = tetsolid;
+			}
+
+
+			/*
+			Update VR headset position and apply to camera.
+			*/
+			controls.update();
+			/*
+			Render the scene through the VREffect.
+			*/
+			effect.render( scene, camera );
+			requestAnimationFrame( animate );
+		}
+		/*
+		Kick off animation loop
+		*/
+		animate();
+
+		//links
+
+		function link(){
+				window.location="http://vihart.github.io/webVR-playing-with/spindex.html";
+		}
+
+		//listen for mouse movement to get mouseX and mouseY
+
+		document.body.addEventListener( 'mousemove', function (event) {
+		 	mouseY = event.clientY;
+		 	mouseX = event.clientX;
+		});
+
+		//listen for click
+
+		document.body.addEventListener( 'click', function(){
+			clicky +=1;
+			if(clicky>2){
+				clicky=0;
+			}
+		})
+		/*
+		Listen for click event to enter full-screen VR mode
+		*/
+		document.body.addEventListener( 'click', function() {
+			effect.setFullScreen( true );
+		});
+		/*
+		Listen for keyboard events
+		*/
+		function onkey(event) {
+	    event.preventDefault();
+
+	    if (event.keyCode == 90) { // z
+	    	controls.zeroSensor(); //zero rotation
+	    } else if (event.keyCode == 70 || event.keyCode == 13) { //f or enter
+	    	effect.setFullScreen(true) //fullscreen
+	    } else if (event.keyCode == 32) {//space
+	  		link();
+	  	}
+
+
+	  };
+	  window.addEventListener("keydown", onkey, true);
+
+	  	  //hold down keys to do rotations and stuff
+		function key(event, sign) {
+		  var control = controls.manualControls[String.fromCharCode(event.keyCode).toLowerCase()];
+		  if (!control)
+		    return;
+		  if (sign === 1 && control.active || sign === -1 && !control.active)
+		    return;
+		  control.active = (sign === 1);
+		  controls.manualRotateRate[control.index] += sign * control.sign;
+		}
+		document.addEventListener('keydown', function(event) { key(event, 1); }, false);
+		document.addEventListener('keyup', function(event) { key(event, -1); }, false);
+
+		/*
+		Handle window resizes
+		*/
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			effect.setSize( window.innerWidth, window.innerHeight );
+		}
+		window.addEventListener( 'resize', onWindowResize, false );
+	</script>
+</html>

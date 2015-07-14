@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+
+<html lang="en">
+	<head>
+		<title>Pointland for webVR</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<style>
+			body {
+				background-color: #000;
+				color: #fff;
+				margin: 0px;
+				padding: 0;
+				overflow: hidden;
+			}
+		</style>
+	</head>
+
+	<body>
+
+	</body>
+
+	<!--
+	three.js 3d library
+	-->
+	<script src="js/lib/three.min.js"></script>
+
+		<!--rotating quaternions library-->
+	<script src="js/lib/gl-matrix.js"></script>
+
+	<!--
+	VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
+	 -->
+	<script src="js/vr/PhoneVR.js"></script>
+	<script src="js/vr/VRControls.js"></script>
+
+	<!--
+	VREffect.js handles stereo camera setup and rendering.
+	-->
+	<script src="js/vr/VREffect.js"></script>
+
+
+
+
+	<script>
+		/*
+		Setup three.js WebGL renderer
+		*/
+		var renderer = new THREE.WebGLRenderer( { antialias: true } );
+		/*
+		Append the canvas element created by the renderer to document body element.
+		*/
+		document.body.appendChild( renderer.domElement );
+		/*
+		Create a three.js scene
+		*/
+		var scene = new THREE.Scene();
+		/*
+		Create a three.js camera
+		*/
+		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 1, 10000 );
+		/*
+		Apply VR headset positional data to camera.
+		*/
+		var controls = new THREE.VRControls( camera );
+		/*
+		Apply VR stereo rendering to renderer
+		*/
+		var effect = new THREE.VREffect( renderer );
+		effect.setSize( window.innerWidth, window.innerHeight );
+
+		var mouseY = 1;
+		var mouseX = 1;
+		var clicky = 0;
+		/*
+		Create 3d objects
+		*/
+
+		  var Things = [];
+		  var boxWave = 0;
+
+		  for (var i = 0; i < 1600; i++) {
+		    Things[i] = new THREE.PointCloud(
+		    	new THREE.BoxGeometry(5,5,5),
+		    	new THREE.PointCloudMaterial(0x55ff00));
+		  scene.add(Things[i]);
+		  Things[i].position.x = (i*10) % 400;
+		  Things[i].position.y = -10;
+		  Things[i].position.z = Math.floor(i/40)*10;
+		  }
+
+		 camera.position.x = 205;
+		 camera.position.z = 205;
+
+
+
+		/*
+		Request animation frame loop function
+		*/
+		function animate() {
+
+			boxWave += .01
+			  for (var i = 0; i < Things.length; i++) {
+			    Things[i].position.y = Math.sin(boxWave*((1/(Things[i].position.x))+2))*10 + Math.sin(boxWave*(2/Things[i].position.z))*10 - 10;
+			  }
+
+
+			 	for (var i = 0; i<Things.length; i++){
+			 	Things[i].material.color.setRGB((Things[i].position.x/400),(Math.abs(Things[i].position.y)/20),.5);
+			 	}
+
+			 if (clicky == 1) {
+			 	for (var i = 0; i<Things.length; i++){
+			 	Things[i].position.y = Math.sin(boxWave*(mouseY/1000));
+			 	}
+			 }
+
+			 if( clicky == 2) {
+			 	for (var i = 0; i<Things.length; i++){
+			 	Things[i].position.y = Math.sin(boxWave*(((Things[i].position.x)/mouseX)+2))*(mouseY/100) + Math.sin(boxWave*(3/Things[i].position.z)) - 10;
+			 	}
+			 }
+
+			 if( clicky == 3) {
+			 	for (var i = 0; i<Things.length; i++){
+			 	Things[i].position.y = Math.sin(boxWave*(((Things[i].position.x)/mouseX)+2))*(mouseY/100) + Math.sin(boxWave*(Things[i].position.z)/mouseY) - 10;
+			 	Things[i].material.color.setRGB((Things[i].position.x/400),(Math.abs(Things[i].position.y)/10),Math.abs(Things[i].position.y)/20);
+			 	}
+
+			 }
+
+
+
+			/*
+			Update VR headset position and apply to camera.
+			*/
+			controls.update();
+			/*
+			Render the scene through the VREffect.
+			*/
+			effect.render( scene, camera );
+			requestAnimationFrame( animate );
+		}
+		/*
+		Kick off animation loop
+		*/
+		animate();
+
+
+		//listen for mouse movement to get mouseX and mouseY
+		document.body.addEventListener( 'mousemove', function (event) {
+		 	mouseY = event.clientY;
+		 	mouseX = event.clientX;
+		});
+
+		//listen for click
+		document.body.addEventListener( 'click', function(){
+			clicky = (clicky+1) % 4
+			effect.setFullScreen( true );
+		})
+
+		//linking function
+		function link(){
+			   window.location="http://vihart.github.io/webVR-playing-with/index.html";
+		}
+
+		/*
+		Listen for keyboard events zero positional sensor on appropriate keypress.
+		*/
+		function onkey(event) {
+	    event.preventDefault();
+
+	    if (event.keyCode == 90) { // z
+	    	controls.zeroSensor(); //zero rotation
+	    } else if (event.keyCode == 70 || event.keyCode == 13) { //f or enter
+	    	effect.setFullScreen(true) //fullscreen
+	    } else if (event.keyCode == 32) {//space
+	  		link();
+	  	}
+
+	  };
+	  window.addEventListener("keydown", onkey, true);
+
+	  //hold down keys to do rotations and stuff
+		function key(event, sign) {
+		  var control = controls.manualControls[String.fromCharCode(event.keyCode).toLowerCase()];
+		  if (!control)
+		    return;
+		  if (sign === 1 && control.active || sign === -1 && !control.active)
+		    return;
+		  control.active = (sign === 1);
+		  controls.manualRotateRate[control.index] += sign * control.sign;
+		}
+		document.addEventListener('keydown', function(event) { key(event, 1); }, false);
+		document.addEventListener('keyup', function(event) { key(event, -1); }, false);
+
+		/*
+		Handle window resizes
+		*/
+		function onWindowResize() {
+			camera.aspect = window.innerWidth / window.innerHeight;
+			camera.updateProjectionMatrix();
+			effect.setSize( window.innerWidth, window.innerHeight );
+		}
+		window.addEventListener( 'resize', onWindowResize, false );
+	</script>
+</html>

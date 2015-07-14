@@ -1,0 +1,83 @@
+{
+  "sites": [
+    {
+      "description": "A visualization of British Columbia's coast built with three.js and Cinema 4D.",
+      "icon": "http://mozvr.com/projects/sechelt/project-thumb.png",
+      "name": "Sechelt",
+      "tagline": "Fly Through",
+      "type": "Full-VR WebGL",
+      "path": "/sechelt/?mode=vr",
+      "url": "http://mozvr.github.io/sechelt/?mode=vr"
+    },
+    {
+      "description": "A documentary by DEEP that takes users to the Arctic in 360° VR video, powered by eleVR’s WebGL VR video player.",
+      "icon": "http://mozvr.com/projects/polarsea/project-thumb.png",
+      "name": "Polar Sea",
+      "tagline": "Video",
+      "type": "360 Video",
+      "path": "/polarsea/",
+      "url": "http://mozvr.com/projects/polarsea/content/"
+    },
+    {
+      "description": "A motion-controlled VR sensory experience with Leap Motion and WebGL.",
+      "icon": "http://mozvr.com/projects/rainbowmembrane/project-thumb.png",
+      "name": "Rainbow Membrane",
+      "tagline": "Interactive",
+      "type": "Full-VR WebGL + LeapMotion",
+      "path": "/rainbowmembrane/",
+      "url": "http://mozvr.com/projects/rainbowmembrane/"
+    },
+    {
+      "description": "An animated short in which a drawing comes to life and draws its own life.",
+      "icon": "http://mozvr.com/projects/iamink/project-thumb.png",
+      "name": "I Am Ink",
+      "tagline": "Video",
+      "type": "Full-VR WebGL",
+      "path": "/iamink/play/",
+      "url": "http://mozvr.com/projects/iamink/"
+    },
+    {
+      "description": "Site of the MozVR team",
+      "icon": "",
+      "name": "MozVR.com",
+      "tagline": "Site",
+      "type": "Classic",
+      "url": "http://mozvr.com"
+    },
+    {
+      "description": "A selection of panorama photography.",
+      "icon": "",
+      "name": "Panorama Viewer",
+      "tagline": "Site",
+      "type": "Full-VR WebGL",
+      "path": "/panorama/",
+      "url": "http://mozvr.github.io/panorama-viewer/"
+    },
+    {
+      "description": "We're building a better Internet",
+      "icon": "",
+      "name": "Mozilla.org",
+      "tagline": "Site",
+      "type": "Classic",
+      "url": "https://www.mozilla.org/en-US/"
+    },
+    {
+      "description": "A weird and wonderful visualization of seamlessly-linked primates.",
+      "icon": "",
+      "name": "Monkeys",
+      "tagline": "Site",
+      "type": "Full-VR WebGL",
+      "path": "/vihart/monkeys.html",
+      "url": "http://mozvr.com/projects/monkeys"
+    },
+    {
+      "description": "Coverage of Nepal’s devastating 7.8 magnitude quake in April.",
+      "icon": "",
+      "name": "Nepal Quake",
+      "tagline": "Video",
+      "type": "360 Video",
+      "path": "/nepal/",
+      "url": "http://www.ryot.org/nepal-vr-disaster-virtual-reality"
+    }
+  ]
+}

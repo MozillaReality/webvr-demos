@@ -1,0 +1,22 @@
+body {
+	margin: 0;
+	font-family: Arial, sans-serif;
+	font-weight: 300;
+	font-size: 20px;
+	background: #000;
+}
+
+#content{
+	width: 800px;
+	margin: 40px auto;
+}
+#content a{
+	color: #bbb;
+	-webkit-transition: color 0.1s;
+    -moz-transition: color 0.1s;
+    -o-transition: color 0.1s;
+    transition: color 0.1s;
+}
+#content a:hover{
+	color: #fff;
+}

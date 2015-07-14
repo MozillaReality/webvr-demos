@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width">
+    <title>MozVR
+    </title>
+    <link rel="alternate" href="/demos/mozvr-site/feed.xml" type="application/rss+xml" title="A virtual reality website about virtual reality websites">
+    <!-- link(rel='stylesheet', href='http://code.cdn.mozilla.net/fonts/fira.css')-->
+    <!-- link(href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css')-->
+    <!-- link(href='http://fonts.googleapis.com/css?family=Open+Sans:400,300,300italic,400italic,600,600italic,700,700italic,800italic,800' rel='stylesheet' type='text/css')-->
+    <link rel="stylesheet" href="/demos/mozvr-site/css/fonts/fonts.css">
+    <link rel="stylesheet" href="/demos/mozvr-site/css/global.css">
+  </head>
+  <body>
+    <div class="absolute top-0 left-4">
+      <h1 class="post-title italic ultralight uppercase f-large"><span class="p2 bg-yellow black nowrap">We are the Mozilla VR team. Our goal<br> is to help bring high performance<br> virtual reality to the open web.</span></h1>
+      <div style="width:27rem;" class="p2 white bg-darken4 h4 light">To get started with WebVR, grab the latest build of <a href="/downloads" class="basiclink-white light">Firefox with VR</a>, explore our <a href="/projects" class="basiclink-white light">projects</a>, view <a href="https://github.com/MozVR/" class="basiclink-white light">source</a>, and start building your own experiences.</div>
+    </div>
+    <!-- Container for canvas-->
+    <div id="stage" class="fixed top-0 right-0 bottom-0 left-0 z-1">
+          <!-- ------------ Container element that requestFullscreen is called on-->
+          <div id="vrContainer" class="absolute top-0 left-0 full-width full-height">
+            <iframe id="vrIframe" src="/demos/sechelt" scrolling="no" seamless="seamless" class="full-width full-height b0 overflow-hidden"></iframe>
+            <!-- ------------ Permissions -------------->
+            <div id="vrPermissions" style="bottom: 150px" class="white p2 bg-pink rounded2 absolute bottom-2 right-2 display-none">
+              <div id="vrPermissionsContinue" class="right b-solid b-white hover-blue3 rounded2 w6 uppercase cursor-pointer center-align line-height-4 height4 ml2">Continue</div>This demo requires Fullscreen permissions.  After clicking <em>Continue</em>, you must:
+              <ol class="m0 pt1">
+                <li class="m0">Check the <em class="medium">Remember decision for mozvr.com</em> option.</li>
+                <li class="m0">Click <em class="medium">Allow </em>.</li>
+              </ol>
+            </div>
+            <!-- ------------ Permissions instructions when Fullscreen -------------->
+            <div id="vrPermissionsFs" style="background: rgba(41,44,56,0.8)" class="white absolute top-0 left-0 full-width full-height f-large display-none">
+              <ol style="width: 850px; margin-top: 300px;" class="mx-auto">
+                <li>Check <span class="medium"> Remember decision for mozvr.com</span> option</li>
+                <li>Click <span class="medium"> Allow</span></li>
+                <li>Press <span class="medium"> ESC</span> key to exit fullscreen.</li>
+              </ol>
+            </div>
+            <!-- ------------ Permissions instructions flow completed -------------->
+            <div id="vrPermissionsReady" style="bottom: 150px" class="white p2 bg-pink rounded2 absolute bottom-2 right-2 height7 w13 line-height-7 display-none">Ready to go!</div>
+          </div>
+          <div style="bottom: 150px" class="absolute right-2 bottom-2">
+            <div class="relative right-align">
+              <!-- ------------ VR detected, enter VR -------------->
+              <div id="enterVR" class="p2 cursor-pointer">
+                <div class="table">
+                  <div class="inline-block b-solid b-white hover-blue3 rounded2"><img src="/demos/mozvr-site/images/icon-goggles-2-white.svg" alt="Enter VR" class="w6"></div>
+                </div>
+              </div>
+              <!-- ------------ No VR detected -------------->
+              <div id="getVR" class="white p2 bg-pink rounded2 display-none">
+                <div class="table">
+                  <div class="table-cell left-align pr2 f-small"><span class="light nowrap">Your browser does not support virtual reality.<br>Use <a href="/downloads" class="medium nowrap basiclink-white">Firefox with VR</a> and an Oculus Rift<br>to enter the full VR web experience.</span></div>
+                  <div class="table-cell"><a href="/downloads" class="inline-block bg-lighten2 b2 b-solid b-white hover-blue1 rounded2"><img src="/demos/mozvr-site/images/icon-goggles-1-outlinewhite.svg" alt="Enter VR" class="w5 p2"></a></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <script src="/demos/mozvr-site/scripts/lib/vrDetect.js"></script>
+          <script src="/demos/mozvr-site/scripts/lib/vrEmbed.js"></script>
+    </div>
+    <!-- Header-->
+    <div id="header" class="py2 white bg-darken4">
+      <div class="container">
+        <div class="table">
+          <div class="table-cell"><a href="/"><img src="/demos/mozvr-site/images/logo-mozvr-fira-white.svg" alt="Mozilla" class="mxn1 mt1 w10"></a></div>
+          <div class="table-cell full-width px3 nowrap"><a href="/downloads" class="px2 light rounded1 button hover-light uppercase header-link h5">Downloads</a><a href="/projects" class="px2 light rounded1 button hover-light uppercase header-link h5">Projects</a><a href="/posts" class="px2 light rounded1 button hover-light uppercase header-link h5">Blog</a></div>
+          <div class="table-cell right-align nowrap mxn2 pl2"><a href="https://github.com/MozVR/" target="_blank" class="rounded4 button hover-light px2"><img src="/demos/mozvr-site/images/icon-github-white.svg" alt="Twitter" class="w2"></a><a href="https://twitter.com/hashtag/mozvr" target="_blank" class="rounded4 button hover-light px2"><img src="/demos/mozvr-site/images/icon-twitter-white.svg" alt="Twitter" class="w2"></a>
+            <!--a(href='https://wiki.mozilla.org/IRC' target='_blank').rounded1.button.hover-light IRC-->
+            <!--a(href='https://mail.mozilla.org/listinfo/web-vr-discuss' target='_blank').rounded1.button.hover-light Mailing List-->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Intro-->
+    <div class="py3 white bg-blue4">
+      <div class="container">
+        <!--.clearfix
+        .col.col-10.pb2
+          h1.ultralight
+            | To get started with WebVR, grab the latest build of <a href="/downloads" class="basiclink-blue light">Firefox with VR</a>, explore our <a href="/projects" class="basiclink-blue light">projects</a>, view <a href="https://github.com/MozVR/" class="basiclink-blue light">source</a>, and start building your own experiences.
+        .col.col-2
+        
+        -->
+        <!-- Projects-->
+        <div class="clearfix">
+          <div class="col col-12">
+            <!--.b-solid.b-lighten2.bt2.mt4.mb3-->
+            <h2 class="mb2 h--section">Latest Projects</h2>
+          </div>
+        </div>
+        <div class="clearfix mxn2">
+          <div class="col col-6 m-col-3 px2 py2"><a href="/projects/monkeys/"><img src="/demos/mozvr-site/projects/monkeys/project-thumb.png" class="fit rounded1 outline-blue1"></a>
+                    <h3 class="mt2"><a href="/projects/monkeys/" class="white">Monkeys</a></h3>
+                    <p class="f-small lighten5 light">A weird and wonderful visualization of seamlessly-linked primates.
+                    </p>
+          </div>
+          <div class="col col-6 m-col-3 px2 py2"><a href="/projects/inspirit/"><img src="/demos/mozvr-site/projects/inspirit/project-thumb.png" class="fit rounded1 outline-blue1"></a>
+                    <h3 class="mt2"><a href="/projects/inspirit/" class="white">Inspirit</a></h3>
+                    <p class="f-small lighten5 light">A surreal interactive audio/visual experience.
+                    </p>
+          </div>
+          <div class="col col-6 m-col-3 px2 py2"><a href="/projects/rainbowmembrane/"><img src="/demos/mozvr-site/projects/rainbowmembrane/project-thumb.png" class="fit rounded1 outline-blue1"></a>
+                    <h3 class="mt2"><a href="/projects/rainbowmembrane/" class="white">Rainbow Membrane</a></h3>
+                    <p class="f-small lighten5 light">A motion-controlled VR sensory experience with Leap Motion and WebGL.
+                    </p>
+          </div>
+          <div class="col col-6 m-col-3 px2 py2"><a href="/projects/sechelt/"><img src="/demos/mozvr-site/projects/sechelt/project-thumb.png" class="fit rounded1 outline-blue1"></a>
+                    <h3 class="mt2"><a href="/projects/sechelt/" class="white">Sechelt</a></h3>
+                    <p class="f-small lighten5 light">A visualization of British Columbia's coast built with three.js and Cinema 4D.
+                    </p>
+          </div>
+        </div>
+        <div class="clearfix mxn2">
+          <div class="col col-6 m-col-3 px2 py2"><a href="/projects/panorama-viewer/"><img src="/demos/mozvr-site/projects/panorama-viewer/project-thumb.png" class="fit rounded1 outline-blue1"></a>
+                    <h3 class="mt2"><a href="/projects/panorama-viewer/" class="white">Panorama Viewer</a></h3>
+                    <p class="f-small lighten5 light">A panorama viewer made from equirectangular images mapped to a WebGL sphere that surrounds the user.
+                    </p>
+          </div>
+          <div class="col col-6 m-col-3 px2 py2"><a href="/projects/polarsea/"><img src="/demos/mozvr-site/projects/polarsea/project-thumb.png" class="fit rounded1 outline-blue1"></a>
+                    <h3 class="mt2"><a href="/projects/polarsea/" class="white">The Polar Sea</a></h3>
+                    <p class="f-small lighten5 light">A documentary by DEEP that takes users to the Arctic in 360° VR video, powered by eleVR’s WebGL VR video player.
+                    </p>
+          </div>
+          <div class="col col-6 m-col-3 px2 py2"></div>
+          <div class="col col-6 m-col-3 px2 py2"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Posts-->
+    <div class="py4 bg-white">
+      <div class="container">
+        <div class="clearfix">
+          <div class="col col-12">
+            <h2 class="gray6 mb3 h--section">Latest Posts</h2>
+          </div>
+        </div>
+        <!--.clearfix
+        .col.col-12
+          mixin post-tile('making-sechelt')
+        -->
+        <div class="clearfix">
+          <div class="col col-12">
+                <!--.b-solid.b-gray2.bt4.mt3.mb3-->
+                <div class="clearfix mxn2 mb4">
+                  <div class="col col-4 px2"><a href="/posts/webvr-lands-in-nightly/" class="w8"><img src="/demos/mozvr-site/posts/webvr-lands-in-nightly/post-thumb.png" class="fit rounded1 outline-white"></a></div>
+                  <div class="col col-8 px2">
+                    <h1 class="mt0"><a href="/posts/webvr-lands-in-nightly/" class="black">WebVR Lands in Firefox Nightly</a></h1>
+                    <p class="h4 m0"><span class="gray4"> By<a href="http://twitter.com/@vvuk" target="_blank" class="basiclink-blue">Vlad Vukicevic</a> -<span class="italic">Thursday Jan 15, 2015</span></span><br><span>Today we're adding core VR support directly to Firefox Nightly builds.  Users and content creators will be able to download the latest Firefox Nightly builds and enjoy access to both experimental WebVR functionality alongside continuous Firefox improvements.</span></p>
+                  </div>
+                </div>
+                <!--a(href=post.url)
+                .overflow-hidden
+                  img(src=locals.url + '/posts/'+name+'/'+post.metadata.thumb).rounded1.fit
+                h3.regular.white
+                  = post.metadata.title
+                p.f-small.blue1
+                  = post.metadata.intro
+                -->
+          </div>
+        </div>
+        <div class="clearfix">
+          <div class="col col-12">
+                <!--.b-solid.b-gray2.bt4.mt3.mb3-->
+                <div class="clearfix mxn2 mb4">
+                  <div class="col col-4 px2"><a href="/posts/quick-vr-prototypes/" class="w8"><img src="/demos/mozvr-site/posts/quick-vr-prototypes/post-thumb.png" class="fit rounded1 outline-white"></a></div>
+                  <div class="col col-8 px2">
+                    <h1 class="mt0"><a href="/posts/quick-vr-prototypes/" class="black">Quick VR Mockups with Illustrator</a></h1>
+                    <p class="h4 m0"><span class="gray4"> By<a href="http://twitter.com/@joshcarpenter" target="_blank" class="basiclink-blue">Josh Carpenter</a> -<span class="italic">Tuesday Dec 09, 2014</span></span><br><span>Designing for the VR web is nothing like designing for the desktop and mobile web. Every process and principle must be rethought, including how we prototype our ideas. With a simple cylinder and some precise measurements, however, we can move rapidly between our favorite 2D design apps and the virtual canvas of our headsets.</span></p>
+                  </div>
+                </div>
+                <!--a(href=post.url)
+                .overflow-hidden
+                  img(src=locals.url + '/posts/'+name+'/'+post.metadata.thumb).rounded1.fit
+                h3.regular.white
+                  = post.metadata.title
+                p.f-small.blue1
+                  = post.metadata.intro
+                -->
+          </div>
+        </div>
+        <!-- Web links-->
+        <div class="clearfix">
+          <div class="col col-12">
+            <div class="b-solid b-gray1 bt2 mb4"></div>
+            <h2 class="gray6 mb3 h--section">Around the Web</h2>
+          </div>
+        </div>
+        <div class="clearfix mxn2">
+          <div class="col col-2 sm-col-3 m-col-2 px2"><a href="http://voicesofvr.com/106-josh-carpenter-on-the-future-of-webvr-and-enabling-the-metaverse/" target="_blank"><img src="/demos/mozvr-site/weblinks/voicesofvr.jpg" class="fit rounded1 outline-white"></a>
+                    <h4 class="h5 mt2 mb0"><a href="http://voicesofvr.com/106-josh-carpenter-on-the-future-of-webvr-and-enabling-the-metaverse/" class="black">Josh Carpenter on The Future of WebVR and Enabling the Metaverse</a></h4>
+                    <p class="gray4 m0">Mar 16, 2015
+                    </p>
+          </div>
+          <div class="col col-2 sm-col-3 m-col-2 px2"><a href="http://www.roadtovr.com/oculus-rift-leap-motion-web-vr-demo-rainbow-membrane-mozvr/" target="_blank"><img src="/demos/mozvr-site/weblinks/roadtovr.jpg" class="fit rounded1 outline-white"></a>
+                    <h4 class="h5 mt2 mb0"><a href="http://www.roadtovr.com/oculus-rift-leap-motion-web-vr-demo-rainbow-membrane-mozvr/" class="black">Have an Oculus Rift and Leap Motion? Try This WebVR Demo Right Now</a></h4>
+                    <p class="gray4 m0">Mar 03, 2015
+                    </p>
+          </div>
+          <div class="col col-2 sm-col-3 m-col-2 px2"><a href="http://thewebahead.net/96" target="_blank"><img src="/demos/mozvr-site/weblinks/webahead.jpg" class="fit rounded1 outline-white"></a>
+                    <h4 class="h5 mt2 mb0"><a href="http://thewebahead.net/96" class="black">Reinventing the Web in Virtual Reality with Josh Carpenter and Vladimir Vukicevic</a></h4>
+                    <p class="gray4 m0">Feb 18, 2015
+                    </p>
+          </div>
+          <div class="col col-2 sm-col-3 m-col-2 px2"><a href="http://www.scientificamerican.com/article/virtual-reality-comes-to-the-web-maybe-for-real-this-time/" target="_blank"><img src="/demos/mozvr-site/weblinks/scientificamerican.jpg" class="fit rounded1 outline-white"></a>
+                    <h4 class="h5 mt2 mb0"><a href="http://www.scientificamerican.com/article/virtual-reality-comes-to-the-web-maybe-for-real-this-time/" class="black">Scientific American on Future of WebVR</a></h4>
+                    <p class="gray4 m0">Dec 29, 2014
+                    </p>
+          </div>
+          <div class="col col-2 sm-col-3 m-col-2 px2"><a href="https://medium.com/codame-art-tech/real-sci-fi-of-webvr-codame-interviews-josh-carpenter-vr-mozilla-504601948858" target="_blank"><img src="/demos/mozvr-site/weblinks/codame.jpg" class="fit rounded1 outline-white"></a>
+                    <h4 class="h5 mt2 mb0"><a href="https://medium.com/codame-art-tech/real-sci-fi-of-webvr-codame-interviews-josh-carpenter-vr-mozilla-504601948858" class="black">CODAME Interview: Josh Carpenter on WebVR</a></h4>
+                    <p class="gray4 m0">Nov 18, 2014
+                    </p>
+          </div>
+          <div class="col col-2 sm-col-3 m-col-2 px2"><a href="https://wemo.io/mozilla-virtual-reality-and-the-dawn-of-the-metaverse-511" target="_blank"><img src="/demos/mozvr-site/weblinks/wemo.jpg" class="fit rounded1 outline-white"></a>
+                    <h4 class="h5 mt2 mb0"><a href="https://wemo.io/mozilla-virtual-reality-and-the-dawn-of-the-metaverse-511" class="black">Wemo Labs Interview: Josh Carpenter on WebVR</a></h4>
+                    <p class="gray4 m0">Nov 10, 2014
+                    </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- FAQ-->
+    <div class="py4 bg-gray1">
+      <div class="container">
+        <div class="clearfix">
+          <div class="col col-12">
+            <h2 class="gray6 mb3 h--section">Frequently Asked Questions</h2>
+          </div>
+        </div>
+        <div class="clearfix mxn3">
+          <div class="col col-6 px3">
+            <h4 class="light">Why do I need an Oculus Rift? Will you add support for other headsets?</h4>
+            <p class="gray6 pl2 mt2 mb3 bl4 b-solid b-blue1">Support for other headsets is coming soon. We are using the Rift as our initial test and development HMD because it is the best supported and most widely distributed headset on the market (over 200,000 DK1 and DK2 units shipped). We are deeply committed to device-agnostic WebVR, and are next working on support for Google Cardboard and other devices.</p>
+            <h4 class="light">The demos run slow or choppy for me. How can I improve performance?</h4>
+            <p class="gray6 pl2 mt2 mb3 bl4 b-solid b-blue1">Start with our<a href="/downloads" class="basiclink-blue">display setup tips.</a> VR is a very new technology, and a few settings can make the difference between a smooth or choppy experience.</p>
+            <h4 class="light">Why do I need Firefox Nightly? Can I use standard desktop Firefox?</h4>
+            <p class="gray6 pl2 mt2 mb3 bl4 b-solid b-blue1">VR web support is very new, and we want to test it thoroughly before we ship to all Firefox users. Our intention is to ship VR support in standard desktop Firefox as soon as it's ready.</p>
+          </div>
+          <div class="col col-6 px3">
+            <h4 class="light">Can I use other browsers?</h4>
+            <p class="gray6 pl2 mt2 mb3 bl4 b-solid b-blue1">Yes, in addition to VR-enabled Firefox, mozvr.com also works with experimental VR-enabled<a href="https://drive.google.com/a/google.com/folderview?id=0BzudLt22BqGRbW9WTHMtOWMzNjQ&amp;usp=sharing#list" target="_blank" class="basiclink-blue">builds of Chromium</a> being created by<a href="https://twitter.com/Tojiro" target="_blank" class="basiclink-blue">Brandon Jones</a> of the Chrome team. No other browsers currently support WebVR, but we're hopeful that they will start experimenting as well.</p>
+            <h4 class="light">Can I use Firefox for Android?</h4>
+            <p class="gray6 pl2 mt2 mb3 bl4 b-solid b-blue1">Yes,<a href="https://nightly.mozilla.org/" class="basiclink-blue">Nightly builds</a> of Firefox for Android now support WebVR. The current implementation is rough and will evolve over time. Feedback is welcome!</p>
+            <h4 class="light">Can I build WebVR experiences with HTML and CSS?</h4>
+            <p class="gray6 pl2 mt2 mb3 bl4 b-solid b-blue1">Current builds of Firefox with VR support WebGL VR only, but we are working on adding support for CSS VR. Placing DOM elements into VR scenes presents significant rendering and performance challenges for the browser and will take time to do right, but we believe strongly in the importance of doing so.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Team-->
+    <div class="py4 bg-white">
+      <div class="container">
+        <div class="clearfix">
+          <div class="col col-12">
+            <h2 class="gray6 h--section">Our Team</h2>
+          </div>
+        </div>
+        <div class="clearfix">
+          <div class="col col-8 mb2">
+            <p>The goal of the virtual reality team at Mozilla Research is to explore and foster the virtual reality open web. We are a small core team of Mozillians, and we work with partners and contributors from around the world.</p>
+          </div>
+        </div>
+        <div class="clearfix mxn2">
+          <div class="col col-3 m-col-2 px2"><a href="http://www.twitter.com/joshcarpenter" target="_blank"><img src="/demos/mozvr-site/people/josh-3.png" class="fit rounded1 outline-white"></a>
+                <h4>Josh Carpenter
+                </h4>
+                <p class="h5">VR Researcher,<br>Mozilla<br><a href="http://www.twitter.com/joshcarpenter" class="basiclink-blue">@joshcarpenter</a>
+                </p>
+          </div>
+          <div class="col col-3 m-col-2 px2"><a href="http://www.twitter.com/vvuk" target="_blank"><img src="/demos/mozvr-site/people/vlad-1.jpg" class="fit rounded1 outline-white"></a>
+                <h4>Vlad Vukicevic
+                </h4>
+                <p class="h5">Engineering Director,<br>Mozilla<br><a href="http://www.twitter.com/vvuk" class="basiclink-blue">@vvuk</a>
+                </p>
+          </div>
+          <div class="col col-3 m-col-2 px2"><a href="http://www.twitter.com/whoyee" target="_blank"><img src="/demos/mozvr-site/people/casey-1.png" class="fit rounded1 outline-white"></a>
+                <h4>Casey Yee
+                </h4>
+                <p class="h5">UX Engineer,<br>Mozilla<br><a href="http://www.twitter.com/whoyee" class="basiclink-blue">@whoyee</a>
+                </p>
+          </div>
+          <div class="col col-3 m-col-2 px2"><a href="http://www.twitter.com/dmarcos" target="_blank"><img src="/demos/mozvr-site/people/diego-1.jpg" class="fit rounded1 outline-white"></a>
+                <h4>Diego Marcos
+                </h4>
+                <p class="h5">Developer,<br>Mozilla<br><a href="http://www.twitter.com/dmarcos" class="basiclink-blue">@dmarcos</a>
+                </p>
+          </div>
+          <div class="col col-0 m-col-4 px2"></div>
+        </div>
+      </div>
+    </div>
+    <!-- Footer-->
+    <div class="py3 bg-blue3 light">
+      <div class="container">
+        <div class="clearfix">
+          <div class="col col-12 m-col-8"><a href="https://www.mozilla.org/en-US/" target="_blank"><img src="/demos/mozvr-site/images/logo-mozilla-white.svg" alt="Mozilla" class="w6 mt3 mb2"></a>
+            <p class="h5"><a href="https://www.mozilla.org/en-US/privacy/websites/" target="_blank" class="pr2 blue0">Privacy Policy</a><a href="https://www.mozilla.org/en-US/about/legal/" target="_blank" class="pr2 blue0">Legal Notices</a><a href="https://www.mozilla.org/en-US/about/legal/fraud-report/" target="_blank" class="pr2 blue0">Report Trademark Abuse</a></p>
+            <p class="h6 blue1">Except where otherwise noted, content on this site is licensed under the <a href="http://creativecommons.org/licenses/by-sa/2.5/" target="_blank" class="blue1">Creative Commons Attribution Share-Alike License v3.0</a> or any later version. Site built with <a href="http://wintersmith.io/" target="_blank" class="blue1">Wintersmith</a>.</p>
+          </div>
+          <div class="col m-col-4"></div>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script>
+    onWindowResize();
+    
+    function init() {
+      window.addEventListener( "resize", onWindowResize, false );
+      onWindowResize()
+    }
+    
+    function onWindowResize() {
+      var header = document.getElementById( "header" )
+      header.setAttribute( "style", "margin-top:" + ( window.innerHeight-header.offsetHeight ) + "px" );
+    }
+    
+    window.addEventListener("load", init, false)
+  </script>
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    
+    ga('create', 'UA-24056643-3', 'auto');
+    ga('send', 'pageview');
+  </script>
+</html>

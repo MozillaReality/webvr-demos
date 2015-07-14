@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="none">
+    <title>WebVR demos</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        background: rgb(0,150,221);
+        font-size: 18px;
+      }
+
+      body {
+        color: #fff;
+        font: 1.5rem/1.5 sans-serif;
+        margin: 30px 0;
+        padding: 30px;
+        text-align: center;
+      }
+
+      ul {
+        list-style: none;
+        margin: 30px 0;
+      }
+
+      a {
+        color: #fff;
+        display: block;
+        padding: 15px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>WebVR Demos</h1>
+    <ul id="sites"></ul>
+    <script>
+      (function () {
+
+        function escape_(html) {
+          return String(html)
+            .replace(/&/g, '&amp;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+        }
+
+        fetch('demos/index.json')
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (data) {
+          sites.innerHTML += data.sites.map(function (site) {
+            return '<li><a href="' + escape_(site.path ? ('/demos' + site.path) : site.url) + '">' + escape_(site.name) + '</a></li>';
+          }).join('\n');
+        }).catch(console.error.bind(console));
+
+      })();
+    </script>
+  </body>
+</html>

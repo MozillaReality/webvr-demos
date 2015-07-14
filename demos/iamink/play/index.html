@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>I AM INK - a VR short animation</title>
+    <meta name="viewmode" content="projection=stereo">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+    body {
+        background-color: #000;
+        margin:0; padding:0;
+        overflow: hidden;
+    }
+    #loading{
+        font-family: sans-serif;
+        width: 400px;
+        color: #999;
+        text-align: center;
+        font-size: 20px;
+        position: absolute;
+        margin: auto;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        height: 20px;
+        letter-spacing: 10px;
+        display: none;
+    }
+    </style>
+</head>
+    <body>
+        <div id="loading">EGAD, IT'S LOADING</div>
+    </body>
+</html>
+
+<!-- Include ALL of them Web VR shenanigans -->
+<script src="js/es6-promise.js"></script> <!-- because safari & IE suck -->
+<script src="js/deps/three.js"></script>
+<script src="js/deps/VRControls.js"></script>
+<script src="js/deps/VREffect.js"></script>
+<!--script src="scripts/stats.min.js"></script-->
+
+<!-- Create JS -->
+<script src="scripts/easeljs-0.7.0.min.js"></script>
+<script src="scripts/tweenjs-0.5.0.min.js"></script>
+<script src="scripts/movieclip-0.7.0.min.js"></script>
+<script src="scripts/preloadjs-0.4.0.min.js"></script>
+<script src="scripts/soundjs-0.5.0.min.js"></script>
+
+<!-- Our custom library -->
+<script src="animation/scripts/CanvasSprite.js"></script>
+
+<!-- CreateJS scenes -->
+<script src="animation/act_i_canvas.js"></script>
+
+<!-- Let's get started -->
+<script src="animation/main.js"></script>
+
