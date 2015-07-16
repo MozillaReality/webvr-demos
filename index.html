@@ -66,7 +66,6 @@
               vrInputs.push(devices[i]);
             }
           }
-          if (onError) onError('HMD not available');
         }
 
         if (navigator.getVRDevices) {
@@ -74,11 +73,13 @@
         }
 
         document.getElementById('reset').addEventListener('click', function(e) {
-          var vrInput = vrInputs[0];
-          if (vrInput.resetSensor !== undefined) {
-            vrInput.resetSensor();
-          } else if (vrInput.zeroSensor !== undefined) {
-            vrInput.zeroSensor();
+          for ( var i = 0; i < vrInputs.length; i ++ ) {
+            var vrInput = vrInputs[i];
+            if (vrInput.resetSensor !== undefined) {
+              vrInput.resetSensor();
+            } else if (vrInput.zeroSensor !== undefined) {
+              vrInput.zeroSensor();
+            }
           }
         });
 
