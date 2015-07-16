@@ -38,9 +38,49 @@
   </head>
   <body>
     <h1>WebVR Demos</h1>
+    <button id="reset">Reset Sensor</button>
     <ul id="sites"></ul>
     <script>
       (function () {
+        var vrInputs = [];
+
+        function filterInvalidDevices( devices ) {
+          // Exclude Cardboard position sensor if Oculus exists.
+          var oculusDevices = devices.filter(function(device) {
+            return device.deviceName.toLowerCase().indexOf('oculus') !== -1;
+          });
+
+          if (oculusDevices.length >= 1) {
+            return devices.filter(function(device) {
+              return device.deviceName.toLowerCase().indexOf('cardboard') === -1;
+            });
+          } else {
+            return devices;
+          }
+        }
+
+        function gotVRDevices(devices) {
+          devices = filterInvalidDevices(devices);
+          for (var i = 0; i < devices.length; i ++) {
+            if (devices[i] instanceof PositionSensorVRDevice) {
+              vrInputs.push(devices[i]);
+            }
+          }
+          if (onError) onError('HMD not available');
+        }
+
+        if (navigator.getVRDevices) {
+          navigator.getVRDevices().then(gotVRDevices);
+        }
+
+        document.getElementById('reset').addEventListener('click', function(e) {
+          var vrInput = vrInputs[0];
+          if (vrInput.resetSensor !== undefined) {
+            vrInput.resetSensor();
+          } else if (vrInput.zeroSensor !== undefined) {
+            vrInput.zeroSensor();
+          }
+        });
 
         function escape_(html) {
           return String(html)
