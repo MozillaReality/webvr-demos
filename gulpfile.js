@@ -1,5 +1,5 @@
 var gulp = require('gulp');
-var webserver = require('gulp-webserver');
+var connect = require('gulp-connect');
 var download = require('gulp-download');
 
 const WEB_ROOT = './demos/';
@@ -12,12 +12,7 @@ gulp.task('syncmedia', function() {
 });
 
 gulp.task('webserver', function() {
-  gulp.src(WEB_ROOT)
-    .pipe(webserver({
-      port: process.env.PORT || 8080,
-      host: process.env.HOST || '0.0.0.0',
-      livereload: false,
-      directoryListing: true,
-      open: false
-    }));
+  connect.server({
+    root: WEB_ROOT
+  })
 });
