@@ -16,13 +16,17 @@
     "js"
   ],
   "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-webserver": "^0.9.1",
     "http-server": "^0.8.0",
     "release-it": "0.0.15"
   },
   "dependencies": {
+    "gulp-download": "0.0.1"
   },
   "scripts": {
-    "start": "http-server -p $PORT -i=false -c -1 --cors",
+    "start": "gulp webserver",
+    "postinstall": "gulp syncmedia",
     "release": "release-it"
   }
 }
