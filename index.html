@@ -1,47 +1,108 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <title>WebVR Demos</title>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="robots" content="none">
-    <title>WebVR demos</title>
+    <link rel="stylesheet" href="//code.cdn.mozilla.net/fonts/fira.css">
+    <link rel="stylesheet" href="//fonts.googleapis.com/css?family=Montserrat:400,700">
     <style>
-      * {
+      html {
+        font-size: 11px;
+      }
+
+      body {
+        background: rgb(53,196,232);
+        color: #fff;
+        font: 2rem/1.5 'Montserrat', sans-serif;
+        margin: 0;
+        padding: 3rem;
+      }
+
+      h1 {
+        margin: 0 0 3rem;
+      }
+
+      ul, li {
+        line-height: 1.7;
+        list-style: none;
         margin: 0;
         padding: 0;
       }
 
-      html {
-        background: rgb(0,150,221);
-        font-size: 18px;
+      .note, .note a, .date {
+        color: rgba(255,255,255,0.4);
+        font-family: 'Fira Mono', sans-serif;
       }
 
-      body {
+      .note {
+        border-bottom: 1px dashed rgba(255,255,255,0.25);
+        padding-bottom: 1rem;
+      }
+
+      a:hover {
         color: #fff;
-        font: 1.5rem/1.5 sans-serif;
-        margin: 30px 0;
-        padding: 30px;
-        text-align: center;
       }
 
-      ul {
-        list-style: none;
-        margin: 30px 0;
-      }
-
-      a {
-        color: #fff;
+      .sites a {
         display: block;
-        padding: 15px;
+        padding: .5rem 0;
+      }
+
+      .sites span {
+        border-bottom: 2px solid rgba(0,0,0,0.2);
+        color: #369;
+        display: inline-block;
+        text-decoration: none;
+        transition: all .2s;
+        position: relative;
+        left: 0;
+        top: 0;
+      }
+
+      .sites a:hover span {
+        background-color: #fff;
+        border-bottom-color: #fff;
+        top: .25rem;
+        left: 2rem;
+        padding: .25rem 1rem;
+      }
+
+      #logo {
+        bottom: 3rem;
+        left: 3rem;
+        position: absolute;
+        width: 8rem;
+      }
+
+      button {
+        background: #fff;
+        border: 0;
+        color: rgb(53,196,232);
+        cursor: pointer;
+        font: 2rem 'Fira Mono', monospace;
+      }
+
+      #reset {
+        padding: .5rem 1rem;
+        position: absolute;
+        top: 3rem;
+        right: 3rem;
+      }
+
+      #reset:active {
+        opacity: .5;
       }
     </style>
   </head>
   <body>
     <h1>WebVR Demos</h1>
+    <p class="note"><a href="https://github.com/mozvr/webvr-demos">View on GitHub</a>. Requires Firefox Nightly.</p>
     <button id="reset">Reset Sensor</button>
-    <ul id="sites"></ul>
+    <ul class="sites" id="sites"></ul>
+    <img src="assets/logo-mozilla-white.svg" id="logo" alt="Mozilla" title="Mozilla">
     <script>
       (function () {
+
         var vrInputs = [];
 
         function filterInvalidDevices( devices ) {
@@ -72,7 +133,7 @@
           navigator.getVRDevices().then(gotVRDevices);
         }
 
-        document.getElementById('reset').addEventListener('click', function(e) {
+        reset.addEventListener('click', function(e) {
           for ( var i = 0; i < vrInputs.length; i ++ ) {
             var vrInput = vrInputs[i];
             if (vrInput.resetSensor !== undefined) {
@@ -98,7 +159,7 @@
         })
         .then(function (data) {
           sites.innerHTML += data.sites.map(function (site) {
-            return '<li><a href="' + escape_(site.path ? ('demos' + site.path) : site.url) + '">' + escape_(site.name) + '</a></li>';
+            return '<li><a href="' + escape_(site.path ? ('demos' + site.path) : site.url) + '"><span>' + escape_(site.name) + '</span></a></li>';
           }).join('\n');
         }).catch(console.error.bind(console));
 
