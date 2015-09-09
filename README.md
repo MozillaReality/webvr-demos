@@ -8,10 +8,10 @@ WebVR Demos.
 ### GitHub
 
     # Clone the git repository from GitHub
-    git clone git@github.com:MozVR/vr-demos.git
+    git clone git@github.com:MozVR/webvr-demos.git
 
     # Open the working directory
-    cd vr-demos
+    cd webvr-demos
 
     # Install the Node dependencies
     npm install
