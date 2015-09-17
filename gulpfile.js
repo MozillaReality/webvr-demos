@@ -13,6 +13,7 @@ gulp.task('syncmedia', function() {
 
 gulp.task('webserver', function() {
   connect.server({
-    root: WEB_ROOT
+    root: WEB_ROOT,
+    port: process.env.PORT || 8080
   })
 });
