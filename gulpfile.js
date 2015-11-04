@@ -9,6 +9,8 @@ gulp.task('syncmedia', function() {
     .pipe(gulp.dest('./demos/polarsea/videos/'));
   download('http://mozvr.com/projects/nepal/videos/nepal.mp4')
     .pipe(gulp.dest('./demos/nepal/videos/'));
+  download('http://github.com/Agnostic/VR-Cinema/raw/master/videos/nasa-iss-512.webm')
+    .pipe(gulp.dest('./demos/vr-cinema/videos/'));
 });
 
 gulp.task('webserver', function() {

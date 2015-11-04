@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>VR Cinema for Google Cardboard and Oculus Rift</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <style>
+    body {
+      width: 100%;
+      height: 100%;
+      position: fixed;
+      background-color: #000;
+      color: #fff;
+      margin: 0px;
+      padding: 0;
+      overflow: hidden;
+    }
+
+    video {
+      display: none;
+    }
+    </style>
+  </head>
+  <body>
+    <video id="video" autoplay loop>
+      <source src="videos/nasa-iss-512.webm">
+    </video>
+  </body>
+  <!--
+  three.js 3d library
+  -->
+  <script src="bower_components/threejs/build/three.js"></script>
+  <!--
+  VRControls.js acquires positional information from connected VR devices and applies the transformations to a three.js camera object.
+  -->
+  <script src="bower_components/threejs/examples/js/controls/VRControls.js"></script>
+  <!--
+  VREffect.js handles stereo camera setup and rendering.
+  -->
+  <script src="bower_components/threejs/examples/js/effects/VREffect.js"></script>
+  <!--
+  A polyfill for WebVR using the Device{Motion,Orientation}Event API.
+  -->
+  <script src="bower_components/webvr-polyfill/build/webvr-polyfill.js"></script>
+  <!--
+  Helps enter and exit VR mode, provides best practices while in VR.
+  -->
+  <script src="build/webvr-manager.js"></script>
+</html>
