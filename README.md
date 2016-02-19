@@ -23,6 +23,6 @@ To start the server:
 
     npm start
 
-If you wish to serve the site from a different port:
+If you wish to serve the site from a different port or host:
 
-    PORT=8000 npm start
+    HOST=0.0.0.0 PORT=8000 npm start
