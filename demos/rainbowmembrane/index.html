@@ -4,12 +4,12 @@
     <meta name="viewmode" content="projection=stereo">
     <style>
       body{ margin: 0px; }
-      
+
       @font-face {
         font-family: "GeoSans";
         src: url( "lib/GeosansLight.ttf" );
       }
-    
+
       html{ color:#fff; background:#000; font-family:"GeoSans" }
       #links{
         position: absolute;
@@ -31,7 +31,7 @@
         text-decoration: none;
       }
       a img{
-      
+
         width:35px;
         height:35px;
 
@@ -57,10 +57,10 @@
     <script src = "lib/OrbitControls.js"          ></script>
     <script src = "lib/SubdivisionModifier.js"    ></script>
     <script src = "lib/PhysicsRenderer.js"        ></script>
-    
+
     <script src = "lib/VREffect.js"               ></script>
     <script src = "lib/VRControls.js"             ></script>
-    
+
     <script src = "lib/ShaderLoader.js"           ></script>
 
     <script src = "lib/UserAudio.js"              ></script>
@@ -73,7 +73,7 @@
 
 
     <script src = "lib/TextCreator.js"            ></script>
-    
+
     <script src = "lib/OBJLoader.js"              ></script>
 
     <script src = "RepelerMesh.js"                ></script>
@@ -84,7 +84,7 @@
 
     <script>
 
-      
+
       var VR = true;
       var AUDIO = true;
 
@@ -120,19 +120,19 @@
 
       var tones;
       var camera, renderer, scene , controls;
-      
+
       var vs, fs;
 
       var geometry, material , light;
 
       var gems = [];
-      var raycaster = new THREE.Raycaster(); 
+      var raycaster = new THREE.Raycaster();
 
       var soundPos = new THREE.Vector3();
       var soundPos1 = new THREE.Vector3();
 
       var controller = new Leap.Controller();
-      
+
       if( VR == true ){
         controller.setOptimizeHMD(true);
       }
@@ -145,9 +145,9 @@
       if( AUDIO == true ){
 
         var audioController = new AudioController();
-    
+
         /* var audio = new PositionalAudio( audioController , 'audio/beyondLoop.wav' ,{
-          looping: true 
+          looping: true
         });*/
 
         //var audio = new UserAudio( audioController );
@@ -173,7 +173,7 @@
 
 
       shaders.load( 'ss-fire' , 'fire' , 'simulation' );
-      
+
       shaders.load( 'vs-sem'  , 'sem' , 'vertex' );
       shaders.load( 'fs-sem' , 'sem' , 'fragment' );
 
@@ -185,7 +185,7 @@
 
       OBJLoader.load( 'models/jesus.obj' , function( object ){
 
-      
+
         object.traverse( function ( child ) {
           if ( child instanceof THREE.Mesh ) {
 
@@ -243,7 +243,7 @@
           /*
 
           VR
-          
+
           */
           controls = new THREE.VRControls( camera );
 
@@ -261,7 +261,7 @@
         //scene.fog = new THREE.Fog( 0x000000 , 1000, 40000 );
 
 
-        // loadCube = new THREE.Mesh( 
+        // loadCube = new THREE.Mesh(
         //     new THREE.BoxGeometry( .04 , .04 , .04 ),
         //     new THREE.MeshNormalMaterial()
         // );
@@ -274,7 +274,7 @@
 
         // scene.add( loadCube );
 
-        
+
         var g = new THREE.IcosahedronGeometry(.005 , 1 );
         var m = new THREE.MeshBasicMaterial({
           //map:audioController.texture,
@@ -286,7 +286,7 @@
           mesh.target   = new THREE.Vector3();//toCart( 12 , t , p );
           mesh.velocity = new THREE.Vector3();
           mesh.power    = new THREE.Vector3( 1 , 1 , 1);
-          mesh.radius   = new THREE.Vector3( 1 , 1 , 1); 
+          mesh.radius   = new THREE.Vector3( 1 , 1 , 1);
           REPELERS.push( mesh );
           G.fingers.value.push( mesh.position );
 
@@ -299,7 +299,7 @@
 
 
         window.addEventListener('dblclick', onDoubleClick , false );
-  
+
        }
 
 
@@ -313,7 +313,7 @@
       */
 
       function init(){
-        
+
 
         t = new THREE.Mesh( new THREE.BoxGeometry( .6 , .6 , .6 , 100 , 100 , 100 ) );
 
@@ -323,11 +323,11 @@
 
         //var g = new THREE.Mesh( new THREE.IcosahedronGeometry( 3 , 4 ) );
         gem = new RepelerMesh( 'Parameters' , t, REPELERS , {
-          
+
           vs: shaders.vertexShaders.sem,
           fs: shaders.fragmentShaders.sem,
 
-      
+
           soul:{
 
             repulsionPower:     { type:"f" , value: -.0002 , constraints:[-300  , 0] },
@@ -343,14 +343,14 @@
             t_sem:{type:"t" , value: matcapMetal }
           }
 
-        }); 
+        });
 
         gem.soul.reset( gem.t_og.value );
         gem.toggle();
 
         gems.push( gem );
 
-       
+
 
         /*t = new THREE.Mesh( new THREE.BoxGeometry( .6 , .6 , .6 , 100 , 100 , 100 ) );
 
@@ -372,11 +372,11 @@
         //var g = new THREE.Mesh( new THREE.IcosahedronGeometry( 3 , 4 ) );
         gem = new RepelerMesh( 'Parameters' , t, REPELERS , {
 
-          
+
           vs: shaders.vertexShaders.sem,
 
           fs: shaders.fragmentShaders.sem,
-      
+
           soul:{
 
             repulsionPower:     { type:"f" , value: -.0002 , constraints:[-300  , 0] },
@@ -391,7 +391,7 @@
 
           }
 
-        }); 
+        });
 
         gem.soul.reset( gem.t_og.value );
         gem.toggle();
@@ -404,14 +404,14 @@
         if( AUDIO == true ){
 
           looper.start();
-          
+
           for( var i =0; i < tones.length; i++ ){
 
             tones[i].play();
 
             scene.add( tones[i].mesh );
 
-          } 
+          }
 
         }
 
@@ -426,14 +426,14 @@
         //counter ++;
         //counter %= 10;
         //if( counter ==  0 ){
-          
+
           if( VR == true ){
             controls.update();
           }
 
           G.dT.value = clock.getDelta();
           G.time.value += G.dT.value;
-          
+
           updateFingers( controller.frame() );
 
 
@@ -448,13 +448,13 @@
 
               soundPos.copy( G.fingers.value[4] );
               soundPos1.copy( G.fingers.value[29] );
-              
+
               audioController.update();
 
             }
 
           }else{
-  
+
             // loadCube.rotation.x +=  G.dT.value;
             // loadCube.rotation.y -= .4 * G.dT.value;
             // loadCube.rotation.z += 2. * G.dT.value;
@@ -516,21 +516,21 @@
           var p = leapToScene( frame , frame.hands[0].fingers[fI].positions[bI] );
 
           if( VR == true ){
-            
+
             // z is y || x is x ||  y is -z
             tv1.set( -p[0] , -p[2] , -p[1] );
             r.copy( camera.position );
             tv1.applyQuaternion( camera.quaternion );
             r.add( tv1 );
 
-          }else{ 
+          }else{
 
             r.copy( camera.position );
             tv1.set( p[0] , p[1] -.3 , p[2] - .3 );
             r.add( tv1 );
 
           }
-          
+
 
         }
 
@@ -563,14 +563,14 @@
           var p = leapToScene( frame , frame.hands[1].fingers[fI].positions[bI] );
 
           if( VR == true ){
-            
+
             // z is y || x is x ||  y is -z
             tv1.set( -p[0] , -p[2] , -p[1] );
             r.copy( camera.position );
             tv1.applyQuaternion( camera.quaternion );
             r.add( tv1 );
 
-          }else{ 
+          }else{
 
             r.copy( camera.position );
             tv1.set( p[0] , p[1] -.3 , p[2] - .3 );
@@ -592,14 +592,14 @@
 
       }
 
-   
+
   }
 
   function leapToScene( frame , position  ){
 
 
-    var p =  position;  
-    return [ 
+    var p =  position;
+    return [
       p[0] * .001,
       p[1] * .001,
       p[2] * .001
@@ -609,14 +609,14 @@
 
   function onLoad(){
 
-        
+
         loaded ++;
 
         // loadCube.scale.x = (loaded / neededToLoad) * 1
         // loadCube.scale.y = (loaded / neededToLoad) * 1
         // loadCube.scale.z = (loaded / neededToLoad) * 1
-       
-         
+
+
         if( loaded == neededToLoad ){
           allLoaded = true;
           init();
@@ -628,6 +628,7 @@
 
 
     </script>
+    <script src="../../lib/ga.js"></script>
 
   </body>
 </html>
