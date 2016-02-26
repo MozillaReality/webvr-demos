@@ -210,17 +210,19 @@
             .replace(/>/g, '&gt;');
         }
 
-        fetch('demos/index.json')
-        .then(function (response) {
-          return response.json();
-        })
-        .then(function (data) {
-          sites.innerHTML += data.sites.map(function (site) {
+        var xhr = new XMLHttpRequest();
+        xhr.addEventListener('load', renderSites);
+        xhr.open('get', 'demos/index.json');
+        xhr.send();
+
+        function renderSites (data) {
+          data = JSON.parse(data.target.response);
+          document.querySelector('#sites').innerHTML += data.sites.map(function (site) {
             var url = escape_(site.path ? ('demos' + site.path) : site.url);
             var name = escape_(site.name);
             return '<li><a href="' + url + '"><span class="inner-link" data-hover="' + name + '"><span>' + name + '</span></span></a></li>';
           }).join('\n');
-        }).catch(console.error.bind(console));
+        }
       })();
     </script>
   </body>
