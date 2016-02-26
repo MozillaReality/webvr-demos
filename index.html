@@ -30,8 +30,18 @@
       }
 
       .note, .note a, .date {
-        color: rgba(255,255,255,.5);
+        color: rgba(255,255,255,.75);
+        font-size: 1.25rem;
         font-family: 'Fira Mono', sans-serif;
+      }
+
+      .disclaimer,
+      .disclaimer a {
+        color: rgba(255,255,255,.35);
+      }
+
+      .disclaimer {
+        font-size: 1.2rem;
       }
 
       .note {
@@ -154,7 +164,7 @@
   </head>
   <body>
     <h1>WebVR Demos</h1>
-    <p class="note"><a href="https://github.com/mozvr/webvr-demos">View on GitHub</a>. Requires Firefox Nightly.</p>
+    <p class="note"><a href="https://github.com/mozvr/webvr-demos">View on GitHub</a>. <a href="http://mozvr.com/#start" target="_blank">View WebVR setup instructions.</p>
     <button id="reset">Reset Sensor</button>
     <ul class="sites" id="sites"></ul>
     <img src="assets/logo-mozilla-white.svg" id="logo" alt="Mozilla" title="Mozilla">
