@@ -8,7 +8,7 @@ WebVR Demos.
 ### GitHub
 
     # Clone the git repository from GitHub
-    git clone git@github.com:MozVR/webvr-demos.git
+    git clone https://github.com/MozVR/webvr-demos.git
 
     # Open the working directory
     cd webvr-demos
